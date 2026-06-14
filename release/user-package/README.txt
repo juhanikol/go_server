@@ -1,14 +1,12 @@
-GoServer release package template
+GoServer package
 
-This folder is meant to be shipped with the server executable.
+This folder is a ready-to-run local website package. It includes:
 
-What to do:
-1. Put the executable in this folder.
-2. Start it from this folder.
-3. Open http://localhost:8081/ in your browser.
-4. Edit the files under web/templates and web/static if you want to change the page.
+- `server.json`
+- `web/templates/index.html`
+- `web/static/styles.css`
 
-Start the server:
+How to start:
 
 Windows:
 server.exe
@@ -16,20 +14,24 @@ server.exe
 Linux or macOS:
 ./server
 
-Check that it is running:
-curl http://localhost:8081/health
+How to open it:
 
-Edit these files:
-- web/templates/index.html
-- web/static/styles.css
+- Open `http://localhost:8081/` in your browser.
+- To check that the server is running, use `navigate to http://localhost:8081/health`.
 
-Stop the server:
-- Press Ctrl+C in the terminal running the server.
+Edit your page:
 
-Common problems:
-- Port already in use: stop the other program or change server_address in server.json.
-- Browser cannot connect: check that the server is still running and the port is 8081.
-- Page does not update: save the file and restart the server.
-- Config paths are wrong: check template_dir and static_dir in server.json.
+- Change the HTML in `web/templates/index.html`.
+- Change the CSS in `web/static/styles.css`.
 
-This package is a simple local site template, not production hosting.
+How to stop:
+
+- Press `Ctrl+C` in the terminal where the server is running.
+
+Troubleshooting:
+
+- Port already in use: stop the other program or change `server_address` in `server.json`.
+- Browser cannot connect: check that the server is still running and the port is `8081`.
+- Page changes are not visible: save the files and restart the server.
+- Config paths are wrong: make sure `template_dir` is `web/templates` and `static_dir` is `web/static`.
+
