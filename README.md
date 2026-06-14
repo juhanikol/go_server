@@ -4,9 +4,9 @@
 
 Most users, especially non-technical users, should download a ready-made package from GitHub Releases instead of building from source.
 
-- [Latest Windows build](../../releases/latest/download/go_server-windows.zip)
-- [Latest Linux amd64 build](../../releases/latest/download/go_server-linux-amd64.zip)
-- [Latest Linux arm64 build](../../releases/latest/download/go_server-linux-arm64.zip)
+- [Latest Windows build](../../releases/latest/download/go-server-windows-amd64.zip)
+- [Latest Linux amd64 build](../../releases/latest/download/go-server-linux-amd64.tar.gz)
+- [Latest Linux arm64 build](../../releases/latest/download/go-server-linux-arm64.tar.gz)
 - [All releases](../../releases)
 
 Quick start:
