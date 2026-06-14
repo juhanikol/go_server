@@ -98,7 +98,7 @@ func (GoServer *GoServer) autoRegisterTemplateRoute(FileName string) {
 func (GoServer *GoServer) AddDefaultGoServerRoutes() {
 
 	GoServer.ensureHomeRoute()
-	GoServer.GoServerRouter.Handle("/", GoServer.GoServerHomeHandler)
+	GoServer.GoServerRouter.Handle("/{$}", GoServer.GoServerHomeHandler)
 
 	// Static files: Use the manifest path if provided, otherwise default to web/static.
 	StaticPath := GoServer.Manifest.StaticDir

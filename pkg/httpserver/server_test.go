@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -177,4 +178,70 @@ func TestRenderGoServerErrorReturnsStatusAndPage(t *testing.T) {
 	if !strings.Contains(body, "Short And Stout") || !strings.Contains(body, "The server refused coffee.") {
 		t.Fatalf("expected rendered error page, got %q", body)
 	}
+}
+
+func TestDefaultRoutesServeRootStaticHealthAnd404(t *testing.T) {
+	server := NewGoServer(ServerConfig{}, testLogger())
+	server.Manifest.StaticDir = filepath.Join("..", "..", "web", "static")
+	server.SetHomeRoute(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("home page"))
+	})
+	server.AddDefaultGoServerRoutes()
+
+	t.Run("root", func(t *testing.T) {
+		request := httptest.NewRequest(http.MethodGet, "/", nil)
+		response := httptest.NewRecorder()
+
+		server.activeHandler().ServeHTTP(response, request)
+
+		if response.Code != http.StatusOK {
+			t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+		}
+		if body := response.Body.String(); body != "home page" {
+			t.Fatalf("expected home page body, got %q", body)
+		}
+	})
+
+	t.Run("health", func(t *testing.T) {
+		request := httptest.NewRequest(http.MethodGet, "/health", nil)
+		response := httptest.NewRecorder()
+
+		server.activeHandler().ServeHTTP(response, request)
+
+		if response.Code != http.StatusOK {
+			t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+		}
+		if body := response.Body.String(); body != "OK" {
+			t.Fatalf("expected health body, got %q", body)
+		}
+	})
+
+	t.Run("static", func(t *testing.T) {
+		request := httptest.NewRequest(http.MethodGet, "/__go_server/static/styles.css", nil)
+		response := httptest.NewRecorder()
+
+		server.activeHandler().ServeHTTP(response, request)
+
+		if response.Code != http.StatusOK {
+			t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+		}
+		if body := response.Body.String(); !strings.Contains(body, "Base Styles") {
+			t.Fatalf("expected embedded static body, got %q", body)
+		}
+	})
+
+	t.Run("unknown", func(t *testing.T) {
+		request := httptest.NewRequest(http.MethodGet, "/does-not-exist", nil)
+		response := httptest.NewRecorder()
+
+		server.activeHandler().ServeHTTP(response, request)
+
+		if response.Code != http.StatusNotFound {
+			t.Fatalf("expected status %d, got %d", http.StatusNotFound, response.Code)
+		}
+		if body := response.Body.String(); !strings.Contains(body, "Page Not Found") {
+			t.Fatalf("expected not found error page, got %q", body)
+		}
+	})
 }

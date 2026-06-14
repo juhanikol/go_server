@@ -244,7 +244,19 @@ func (GoServer *GoServer) activeHandler() http.Handler {
 	// TODO: Restore multi-domain routing here when DomainMap has a complete
 	// registration and dispatch model. The current single-project flow must
 	// serve the registered router directly.
-	handler := GoServer.hostPolicyMiddleware(GoServer.GoServerRouter)
+	dispatcher := http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
+		nextHandler, pattern := GoServer.GoServerRouter.Handler(request)
+		if pattern == "" {
+			GoServer.RenderGoServerError(responseWriter, GoServerError{
+				StatusCode: http.StatusNotFound,
+				Title:      "Page Not Found",
+				Message:    "The requested resource does not exist on this server.",
+			})
+			return
+		}
+		nextHandler.ServeHTTP(responseWriter, request)
+	})
+	handler := GoServer.hostPolicyMiddleware(dispatcher)
 	handler = RecoveryMiddleware(GoServer, handler)
 	handler = LoggingMiddleware(handler)
 	return handler
