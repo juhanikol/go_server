@@ -1,10 +1,15 @@
 # GoServer
 
-GoServer is a small modular Go HTTP server skeleton and learning project. It is meant to demonstrate how a simple standard-library web server can be organized into reusable packages, a runnable example app, and embedded fallback assets.
+GoServer is a small Go HTTP server skeleton and learning project. It is meant to show how a standard-library server can be split into reusable packages, example programs, runtime configuration, and embedded fallback assets.
 
-This is not a production framework. Some fields and ideas are intentionally still in progress.
+This project has two intended use cases:
 
-## Project background
+1. Developer use: reusable `pkg/` packages and small examples that show how to import and use the server from Go code.
+2. End-user use: a simple executable + `server.json` + `web/templates` + `web/static` flow for serving a local HTML/CSS site.
+
+This is not a production framework.
+
+## Project Background
 
 This project began as a personal learning exercise for understanding Go’s standard library, goroutines, HTTP server behavior, routing, middleware, and HTML template rendering. I intentionally avoided mature third-party routers and frameworks, such as chi, because the goal was to understand the underlying mechanics rather than hide them behind an existing abstraction.
 
@@ -18,54 +23,71 @@ This cleanup is also being done as a practical exercise in AI-assisted developme
 
 ## What It Demonstrates
 
-- Building an HTTP server using Go’s standard library
-- Registering application routes through a small server abstraction
-- Using middleware for logging, method checks, and panic recovery
-- Rendering HTML templates
-- Embedding fallback pages and static assets into the compiled binary
-- Loading runtime configuration from JSON
-- Handling graceful shutdown
-- Keeping a runnable example application inside the repository
-Using AI-assisted development in small, reviewable commits
-- Graceful shutdown on interrupt or `SIGTERM`.
-- A runnable example server under `cmd/example_server`.
+- route registration with the standard library
+- middleware for method checks, logging, and panic recovery
+- structured logging
+- graceful shutdown
+- runtime config loading from JSON
+- embedded fallback pages and embedded static assets
+- serving a real local HTML/CSS page from `web/templates` and `web/static`
+- a reusable import example under `examples/minimal`
+- a folder-based local site example under `examples/html_site`
+
+## Current Status
+
+- `go run ./cmd/example_server` works from the repository root.
+- `/health` returns `OK`.
+- `/` serves the example page when `web/templates/index.html` exists.
+- embedded fallback pages remain in place as safety nets.
+- `/__go_server/static/styles.css` serves the embedded stylesheet.
+- `DomainMap` is not part of the current single-project flow.
+- `AllowedHosts` is opt-in: empty or nil allows all hosts, configured hosts restrict requests.
+- TLS and multi-domain routing are future work.
 
 ## Repository Structure
 
 ```text
 .
-├── AGENTS.md
-├── AGENTS_comds.md
-├── README.md
-├── go.mod
 ├── cmd/
 │   └── example_server/
 │       ├── main.go
-│       ├── server.json
 │       └── myproject/
 │           └── myproject.go
 ├── examples/
-│   └── api/
-│       └── apicaller_examples.txt
-└── pkg/
-    ├── httpserver/
-    │   ├── server.go
-    │   ├── routes.go
-    │   ├── middleware.go
-    │   ├── errors.go
-    │   ├── embed.go
-    │   ├── server_test.go
-    │   └── assets/
-    │       ├── README.md
-    │       ├── serverindex.html
-    │       ├── servererror.html
-    │       └── styles.css
-    ├── logging/
-    │   └── logger.go
-    └── serverapp/
-        ├── config.go
-        ├── serverapp.go
-        └── serverapp_test.go
+│   ├── html_site/
+│   │   ├── README.md
+│   │   ├── main.go
+│   │   └── site/
+│   │       ├── index.html
+│   │       └── styles.css
+│   └── minimal/
+│       └── main.go
+├── pkg/
+│   ├── httpserver/
+│   │   ├── assets/
+│   │   │   ├── README.md
+│   │   │   ├── servererror.html
+│   │   │   ├── serverindex.html
+│   │   │   └── styles.css
+│   │   ├── embed.go
+│   │   ├── errors.go
+│   │   ├── middleware.go
+│   │   ├── routes.go
+│   │   ├── server.go
+│   │   └── server_test.go
+│   └── serverapp/
+│       ├── config.go
+│       ├── serverapp.go
+│       └── serverapp_test.go
+├── server.json
+├── web/
+│   ├── static/
+│   │   └── styles.css
+│   └── templates/
+│       └── index.html
+├── go.mod
+├── README.md
+└── AGENTS.md
 ```
 
 ## Quick Start
@@ -76,23 +98,19 @@ From the repository root:
 go run ./cmd/example_server
 ```
 
-The example server listens on `:8081`.
+Then open:
+
+```text
+http://localhost:8081/
+```
 
 ## Manual Checks
-
-In another terminal:
 
 ```bash
 curl -i http://localhost:8081/
 curl -i http://localhost:8081/health
 curl -i http://localhost:8081/__go_server/static/styles.css
 ```
-
-Expected current behavior:
-
-- `/` returns the embedded GoServer fallback landing page if no project homepage template exists.
-- `/health` returns `OK`.
-- `/__go_server/static/styles.css` returns the embedded stylesheet.
 
 ## Development Commands
 
@@ -103,32 +121,70 @@ go vet ./...
 go run ./cmd/example_server
 ```
 
-## Configuration
+## Examples
 
-The example app provides required startup defaults in `cmd/example_server/main.go`. The active config merge code also looks for optional config files relative to the process working directory:
+### `examples/minimal`
 
-- `server.json`
-- `web/server.json`
-- `config/server.json`
+Demonstrates importing `pkg/httpserver` from another Go program and registering a route directly in code.
 
-The example config file is at `cmd/example_server/server.json`. It is useful as a sample, but the documented root command currently relies on explicit defaults in `main.go`.
+Run:
+
+```bash
+go run ./examples/minimal
+```
+
+Open:
+
+```text
+http://localhost:8082/hello
+```
+
+### `examples/html_site`
+
+Demonstrates the beginner-friendly local site flow: point the example at a folder of HTML/CSS files and run it locally.
+
+Run:
+
+```bash
+go run ./examples/html_site
+```
+
+Open:
+
+```text
+http://localhost:8083/
+```
+
+## Configuration Overview
+
+The repository includes a sample `server.json` at the root. It documents the current runtime knobs used by the example server and future executable-based deployments.
+
+Common fields include:
+
+- `server_address`
+- `root_path`
+- `template_dir`
+- `static_dir`
+- `allowed_hosts`
+- `read_timeout_sec`
+- `read_header_timeout_sec`
+- `write_timeout_sec`
+- `idle_timeout_sec`
+- `shutdown_timeout_sec`
+- `log_file_name`
+- `log_level`
+
+The current `cmd/example_server/main.go` also sets matching defaults directly so the documented `go run ./cmd/example_server` command works from the repository root.
+
+## Why There Are Two README Files
+
+This root `README.md` is for GitHub visitors, contributors, reviewers, and portfolio readers. It can mention examples, package boundaries, config shape, and project status.
+
+`pkg/httpserver/assets/README.md` is different: it is embedded into the built server and should stay short, practical, and user-facing. It is meant to help someone who already has the executable running.
 
 ## Known Limitations
 
-- Multi-domain routing through `DomainMap` is future work. The current flow serves a single project through the registered router.
-- TLS, `AllowedHosts`, and related security fields may be declared but are not fully implemented yet.
-- Project template and static directories are not included in this repository, so the example may log that `web/templates` is missing and then use embedded fallback pages.
-- This project is still a learning skeleton, not a hardened production framework.
-
-## Current status
-
-This project is not intended to be a production-ready web framework. It is a learning and portfolio project that demonstrates how a small Go HTTP server can be structured from few principles.
-
-The current cleanup work focuses on:
-
-- making the example server start reliably from the documented command,
-- clarifying configuration behavior,
-- restoring request routing through the registered router,
-separating future multi-domain support from the current single-project server flow,
-- updating the documentation to match the real implementation,
-- and adding tests for the most important runtime behavior.
+- `DomainMap` is future work and not part of the current single-project request flow.
+- TLS support is not a completed end-user feature yet.
+- `AllowedHosts` is opt-in rather than a default restriction.
+- The project is still a learning skeleton, not a hardened production framework.

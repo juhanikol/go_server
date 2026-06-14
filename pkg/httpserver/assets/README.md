@@ -1,26 +1,22 @@
 # Server Help
 
-This executable starts a small HTTP server. It can serve project routes, a health check, and built-in fallback pages when project templates are missing.
+This is a small local HTTP server. It serves the example page, a health check, and embedded fallback pages when project files are missing.
 
 ## Start The Server
 
 Windows:
 
 ```powershell
-.\server.exe
+server.exe
 ```
 
-macOS or Linux:
+Linux or macOS:
 
 ```bash
 ./server
 ```
 
-If the server starts correctly, it should print startup log lines and listen on its configured address.
-
 ## Check If It Is Running
-
-Default example address:
 
 ```bash
 curl http://localhost:8081/health
@@ -32,53 +28,51 @@ Expected response:
 OK
 ```
 
-You can also open this in a browser:
+You can also open:
 
 ```text
 http://localhost:8081/
 ```
 
-## Check The Config File
+## Edit The Site
 
-Look for `server.json` near the executable or in the configured app folder.
+Edit the HTML and CSS files in the project:
 
-Common values to check:
+- `web/templates/index.html`
+- `web/static/styles.css`
+
+## Check Config
+
+Look at `server.json` near the executable or in the working directory.
+
+Common fields:
 
 - `server_address`
-- `log_file_name`
-- `log_level`
 - `template_dir`
 - `static_dir`
+- `allowed_hosts`
+- `log_file_name`
+- `log_level`
 
-For `log_level`, use a readable string such as:
+## Check Logs
 
-```json
-"log_level": "INFO"
-```
+Look at the configured log file, usually `app.log`.
 
-## Check The Log File
-
-Look for the configured log file, commonly:
-
-```text
-app.log
-```
-
-The log file can show startup errors, missing templates, route errors, and panic recovery messages.
+Logs can show startup problems, missing files, rejected hosts, and panic recovery messages.
 
 ## Common Problems
 
 ### Port Already In Use
 
-If startup says the address is already in use, another program is using the port.
+Another program may already be using the port.
 
-Windows PowerShell:
+Windows:
 
 ```powershell
 netstat -ano | findstr :8081
 ```
 
-macOS or Linux:
+Linux or macOS:
 
 ```bash
 lsof -i :8081
@@ -88,7 +82,7 @@ Fix: stop the other program or change `server_address` in `server.json`.
 
 ### Health Check Fails
 
-If this fails:
+If this does not return `OK`:
 
 ```bash
 curl http://localhost:8081/health
@@ -96,25 +90,25 @@ curl http://localhost:8081/health
 
 Check that:
 
-- the server executable is still running,
+- the server is still running,
 - the port matches `server_address`,
-- a firewall is not blocking local connections,
 - the log file does not show a startup error.
 
-### Homepage Shows A Built-In Page
+### Built-In Page Appears
 
-This usually means the project homepage template was not found or no custom homepage was configured.
-
-Check:
-
-- `template_dir` in `server.json`,
-- whether the template folder exists,
-- whether the log file mentions a missing template directory.
-
-### Static Files Do Not Load
+The embedded page is a fallback. It usually means the template file is missing or the template folder is misconfigured.
 
 Check:
 
-- `static_dir` in `server.json`,
-- whether the static folder exists,
-- whether the requested file path is correct.
+- `template_dir` in `server.json`
+- `web/templates/index.html`
+- the log file for missing template messages
+
+### Styles Do Not Load
+
+Check:
+
+- `static_dir` in `server.json`
+- `web/static/styles.css`
+- the browser URL for the stylesheet
+
