@@ -69,11 +69,12 @@ func (GoServer *GoServer) ScanProjectResources() {
 
 // autoRegisterTemplateRoute creates an implicit GET route for a template file.
 func (GoServer *GoServer) autoRegisterTemplateRoute(FileName string) {
-	// Calculate route: "contact.html" -> "/contact", "index.html" -> "/"
-	RoutePath := "/" + strings.TrimSuffix(FileName, ".html")
 	if FileName == "index.html" {
-		RoutePath = "/"
+		return
 	}
+
+	// Calculate route: "contact.html" -> "/contact"
+	RoutePath := "/" + strings.TrimSuffix(FileName, ".html")
 
 	// Logic: If the developer already defined this path in the Manifest, do nothing.
 	if _, exists := GoServer.Manifest.RouteMap[RoutePath]; exists {
