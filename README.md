@@ -122,7 +122,7 @@ The example config file is at `cmd/example_server/server.json`. It is useful as 
 
 ## Current status
 
-This project is not intended to be a production-ready web framework. It is a learning and portfolio project that demonstrates how a small Go HTTP server can be structured from first principles.
+This project is not intended to be a production-ready web framework. It is a learning and portfolio project that demonstrates how a small Go HTTP server can be structured from few principles.
 
 The current cleanup work focuses on:
 
