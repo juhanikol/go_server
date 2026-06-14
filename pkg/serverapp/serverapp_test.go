@@ -60,7 +60,8 @@ func TestLoadAndMergeConfigAcceptsStringLogLevel(t *testing.T) {
 		"log_max_size_mb": 12,
 		"log_level": "INFO",
 		"template_dir": "web/templates",
-		"static_dir": "web/static"
+		"static_dir": "web/static",
+		"allowed_hosts": ["localhost", "127.0.0.1", "::1"]
 	}`)
 	if err := os.WriteFile(filepath.Join(dir, "server.json"), configJSON, 0644); err != nil {
 		t.Fatalf("write valid config: %v", err)
@@ -84,6 +85,9 @@ func TestLoadAndMergeConfigAcceptsStringLogLevel(t *testing.T) {
 	}
 	if config.TemplateDir != "web/templates" {
 		t.Fatalf("expected template dir to merge, got %q", config.TemplateDir)
+	}
+	if len(config.AllowedHosts) != 3 {
+		t.Fatalf("expected allowed hosts to merge, got %#v", config.AllowedHosts)
 	}
 }
 

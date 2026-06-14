@@ -14,5 +14,5 @@
     "use_tls": false,
     "cert_file": "",
     "key_file": "",
-    "allowed_hosts": ["localhost", "127.0.0.1", "myproject.local"]
+    "allowed_hosts": ["localhost", "127.0.0.1", "myproject.local", "::1"]
 }

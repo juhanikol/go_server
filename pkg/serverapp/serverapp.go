@@ -59,7 +59,7 @@ type AppConfig struct {
 	UseTLS       bool     // Enable HTTPS
 	CertFile     string   // Path to SSL certificate
 	KeyFile      string   // Path to SSL key
-	AllowedHosts []string // List of valid hostnames for security
+	AllowedHosts []string `json:"allowed_hosts"` // List of valid hostnames for security
 
 	// Callback
 	BuildServer func(Server *httpserver.GoServer) error //
@@ -111,6 +111,7 @@ func Run(Config AppConfig) error {
 		ServerAddress:      Config.ServerAddress,
 		ServerReadTimeout:  time.Duration(Config.ReadTimeout) * time.Second,
 		ServerWriteTimeout: time.Duration(Config.WriteTimeout) * time.Second,
+		AllowedHosts:       Config.AllowedHosts,
 	}, AppLogger)
 
 	// Set Environment and Manifest
@@ -228,6 +229,9 @@ func loadAndMergeConfig(c AppConfig) (AppConfig, error) {
 		}
 		if loggingConfig.LogLevel != nil {
 			c.LogLevel = *loggingConfig.LogLevel
+		}
+		if len(fileConfig.AllowedHosts) > 0 {
+			c.AllowedHosts = fileConfig.AllowedHosts
 		}
 	}
 
