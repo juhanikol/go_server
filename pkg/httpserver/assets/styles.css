@@ -1,0 +1,231 @@
+/* Base Styles - Default settings for the document */
+body {
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding-bottom: 100px; /* Reserve space for the fixed comparison tray at the bottom */
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Search Form Section */
+.search-section {
+    background-color: #2a2a2a;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group label {
+    font-size: 0.9em;
+    color: #bbb;
+}
+
+.filter-group input {
+    background: #333;
+    border: 1px solid #444;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Cards Grid */
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.car-card {
+    background-color: #252525;
+    border: 1px solid #333;
+    padding: 15px;
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+.car-card:hover {
+    transform: translateY(-5px);
+    border-color: #4CAF50;
+}
+
+.thumbnail-container {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background-color: #111;
+}
+
+.car-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Buttons */
+.btn, .btn-secondary {
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    text-align: center;
+}
+
+/* Primary Button (Green) - Used for main actions */
+.btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+/* Secondary Button (Dark Grey) - Used for alternative actions */
+.btn-secondary {
+    background-color: #444;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #555;
+}
+
+.btn:active, .btn-secondary:active {
+    transform: scale(0.98);
+}
+
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+/* Comparison Tray - Fixed bottom bar for selected items */
+.comparison-tray {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #333;
+    border-top: 3px solid #4CAF50;
+    padding: 15px 0;
+    z-index: 1000;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+}
+
+.tray-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selected-container {
+    display: flex;
+    gap: 15px;
+}
+
+.tray-item {
+    background: #444;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+}
+
+.btn-compare {
+    background-color: #2196F3;
+    font-weight: bold;
+}
+
+.hint {
+    font-size: 0.8em;
+    color: #888;
+}
+
+.error-banner {
+    background: #721c24;
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+/* Comparison Page Layout */
+.compare-grid {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.compare-column {
+    flex: 1;
+    background: #252525;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.compare-table th, .compare-table td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.table-header {
+    background: #333;
+    color: #4CAF50;
+    text-align: center !important;
+}
+
+.image-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9; /* Forces a consistent 16:9 aspect ratio for all images */
+    overflow: hidden;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.responsive-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

@@ -1,0 +1,107 @@
+// This provides a modular example for creating API service callers.
+// It demonstrates how to fetch, decode, and orchestrate data from external JSON APIs.
+package assets
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"time"
+)
+
+// GenericModel serves as a blueprint for actual data structures.
+type GenericModel struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+// DetailedModel demonstrates how to combine data from multiple API endpoints.
+type DetailedModel struct {
+	Base     GenericModel
+	Metadata map[string]interface{}
+}
+
+// Fetcher is the service engine responsible for communicating with an external API.
+type Fetcher struct {
+	BaseURL    string
+	HTTPClient *http.Client
+}
+
+// NewFetcher initializes the Fetcher with a timeout-enabled HTTP client.
+func NewFetcher(BaseURL string) *Fetcher {
+	return &Fetcher{
+		BaseURL: BaseURL,
+		// 5-second timeout to prevent the GoServer from hanging on slow APIs.
+		HTTPClient: &http.Client{Timeout: 5 * time.Second},
+	}
+}
+
+// GetAllItems demonstrates fetching a list of resources.
+func (Fetcher *Fetcher) GetAllItems(Endpoint string) ([]GenericModel, error) {
+	FullURL := fmt.Sprintf("%s/%s", Fetcher.BaseURL, Endpoint)
+
+	Response, err := Fetcher.HTTPClient.Get(FullURL)
+	if err != nil {
+		return nil, fmt.Errorf("API connection error: %w", err)
+	}
+	defer Response.Body.Close()
+
+	if Response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API returned error status: %d", Response.StatusCode)
+	}
+
+	var Items []GenericModel
+	if err := json.NewDecoder(Response.Body).Decode(&Items); err != nil {
+		return nil, fmt.Errorf("failed to decode API response: %w", err)
+	}
+	return Items, nil
+}
+
+// GetDetailedData uses concurrent Go-routines
+// Use this pattern when you need to fetch data from two different endpoints at once.
+func (Fetcher *Fetcher) GetDetailedData(ItemID int) (DetailedModel, error) {
+	// 1. Fetch the primary resource first
+	BaseData, err := Fetcher.fetchSingleItem(ItemID)
+	if err != nil {
+		return DetailedModel{}, err
+	}
+
+	// 2. Create channels to receive concurrent data
+	// for better performance.
+	MetaChannel := make(chan map[string]interface{})
+
+	// 3. Start a Go-routine for the secondary call
+	go func() {
+		// Example: Fetching related metadata or social stats
+		// In a real project, you would replace this with a real fetch function.
+		Result := map[string]interface{}{"last_updated": time.Now().String()}
+		MetaChannel <- Result
+	}()
+
+	// 4. Assemble the final struct
+	return DetailedModel{
+		Base:     BaseData,
+		Metadata: <-MetaChannel,
+	}, nil
+}
+
+// fetchSingleItem is an internal helper for individual resource retrieval.
+func (Fetcher *Fetcher) fetchSingleItem(ID int) (GenericModel, error) {
+	FullURL := fmt.Sprintf("%s/items/%d", Fetcher.BaseURL, ID)
+
+	Response, err := Fetcher.HTTPClient.Get(FullURL)
+	if err != nil {
+		return GenericModel{}, err
+	}
+	defer Response.Body.Close()
+
+	if Response.StatusCode == http.StatusNotFound {
+		return GenericModel{}, fmt.Errorf("resource not found")
+	}
+
+	var Item GenericModel
+	if err := json.NewDecoder(Response.Body).Decode(&Item); err != nil {
+		return GenericModel{}, err
+	}
+	return Item, nil
+}

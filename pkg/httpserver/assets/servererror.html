@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.PageTitle}}</title>
+    <link rel="stylesheet" href="/__go_server/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="error-banner">
+            <h1>{{.MainHeading}}</h1>
+            <p>{{.ErrorMessage}}</p>
+        </div>
+        
+        <div class="search-section" style="margin-top: 20px; border-left: 4px solid #4CAF50;">
+            <h3>Developer Note:</h3>
+            <p>This is the <strong>GoServer Internal Error Page</strong>.</p>
+            <p>If you see this, ensure your project templates are correctly placed in <code>web/templates/</code>.</p>
+        </div>
+
+        <nav style="margin-top: 30px;">
+            <a href="/" class="btn">Return to Home</a>
+        </nav>
+    </div>
+</body>
+</html>

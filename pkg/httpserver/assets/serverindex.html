@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.PageTitle}}</title>
+    <link rel="stylesheet" href="/__go_server/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>{{.MainHeading}}</h1>
+
+        <section class="search-section">
+            <p><strong>GoServer</strong> is online and is currently showing its own internal landing page.</p>
+
+            {{if .DisplayValue}}
+                <p>{{.DisplayValue}}</p>
+            {{else}}
+                <p>No custom homepage was rendered, so this fallback page is being shown instead.</p>
+            {{end}}
+
+            {{if .ErrorMessage}}
+                <div class="error-banner" style="margin-top: 20px;">
+                    <p>{{.ErrorMessage}}</p>
+                </div>
+            {{end}}
+        </section>
+
+        <div class="car-grid">
+            <div class="car-card">
+                <h3>Server Status</h3>
+                <p>Status: <span style="color: #4CAF50;">Operational</span></p>
+                <p>This page belongs to the GoServer instance, not to the project homepage.</p>
+
+                <div class="card-actions">
+                    <a href="/health" class="btn-secondary">Health Check</a>
+                </div>
+            </div>
+
+            <div class="car-card">
+                <h3>Developer Note</h3>
+                <p>If you expected a project homepage here, then either:</p>
+                <ul>
+                    <li>no custom home route was registered,</li>
+                    <li>the homepage template could not be rendered, or</li>
+                    <li>GoServer switched to this internal page as a fallback.</li>
+                </ul>
+                <p>Check your route registration and template files under <code>web/templates/</code>.</p>
+            </div>
+
+            <div class="car-card">
+                <h3>Registered API Endpoints</h3>
+
+                {{if .APIEndpoints}}
+                    <p>The following API or diagnostic endpoints were registered by the project:</p>
+                    <ul>
+                        {{range .APIEndpoints}}
+                            <li>
+                                <a href="{{.Path}}" class="btn-secondary" style="margin-bottom: 8px;">{{.Path}}</a>
+                                {{if .Description}}
+                                    <div style="margin-top: 6px; color: #bbb;">{{.Description}}</div>
+                                {{end}}
+                            </li>
+                        {{end}}
+                    </ul>
+                {{else}}
+                    <p>No API endpoints were provided to this internal landing page.</p>
+                    <p>This does <strong>not</strong> necessarily mean the project has no routes. It only means no endpoint list was passed into this template.</p>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
