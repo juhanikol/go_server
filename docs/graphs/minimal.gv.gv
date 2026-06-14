@@ -1,0 +1,138 @@
+digraph gocallvis {
+    label="go_server/examples/minimal";
+    labeljust="l";
+    fontname="Arial";
+    fontsize="14";
+    rankdir="TB";
+    bgcolor="lightgray";
+    style="solid";
+    penwidth="0.5";
+    pad="0.0";
+    nodesep="0.35";
+
+    node [shape="box" style="filled,rounded" fillcolor="honeydew" fontname="Verdana" penwidth="1.0" margin="0.16,0.0"];
+    edge [minlen="2"]
+
+    subgraph "cluster_focus" {
+        bgcolor="#e6ecfa";
+label="main";
+labelloc="t";
+labeljust="c";
+fontsize="18";
+        
+        "go_server/examples/minimal.main$1" [ fillcolor="lightblue" label="main$1" style="dotted,filled" tooltip="go_server/examples/minimal.main$1 | defined in main.go:19\nat main.go:20: calling [fmt.Fprintln]" ]
+        "go_server/examples/minimal.main" [ fillcolor="lightblue" label="main" penwidth="0.5" tooltip="go_server/examples/minimal.main | defined in main.go:12\nat main.go:15: calling [go_server/pkg/httpserver.NewGoServer]\nat main.go:19: calling [(*go_server/pkg/httpserver.GoServer).RegisterRoute]\nat main.go:22: calling [(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes]\nat main.go:24: calling [(*log/slog.Logger).Info]\nat main.go:25: calling [(*go_server/pkg/httpserver.GoServer).Start]\nat main.go:13: calling [log/slog.NewTextHandler]\nat main.go:13: calling [log/slog.New]\nat main.go:26: calling [(*log/slog.Logger).Error]\nat main.go:27: calling [os.Exit]" ]
+        
+        subgraph "cluster_fmt" {
+        penwidth="0.8";
+fontsize="16";
+style="filled";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+rank="sink";
+label="fmt";
+URL="/?f=fmt";
+tooltip="package: fmt";
+        
+        "fmt.Fprintln" [ label="Fprintln" penwidth="1.5" tooltip="fmt.Fprintln | defined in print.go:303" fillcolor="#adedad" ]
+        
+    }
+
+        subgraph "cluster_go_server/pkg/httpserver" {
+        fontsize="16";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+label="go_server/pkg/httpserver";
+URL="/?f=go_server/pkg/httpserver";
+penwidth="0.8";
+style="filled";
+rank="sink";
+tooltip="package: go_server/pkg/httpserver";
+        
+        "go_server/pkg/httpserver.NewGoServer" [ fillcolor="#adedad" label="NewGoServer" penwidth="1.5" tooltip="go_server/pkg/httpserver.NewGoServer | defined in server.go:71" ]
+        "(*go_server/pkg/httpserver.GoServer).RegisterRoute" [ label="(*GoServer).RegisterRoute" penwidth="1.5" tooltip="(*go_server/pkg/httpserver.GoServer).RegisterRoute | defined in server.go:123" fillcolor="#adedad" ]
+        "(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes" [ fillcolor="#adedad" label="(*GoServer).AddDefaultGoServerRoutes" penwidth="1.5" tooltip="(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes | defined in routes.go:98" ]
+        "(*go_server/pkg/httpserver.GoServer).Start" [ fillcolor="#adedad" label="(*GoServer).Start" penwidth="1.5" tooltip="(*go_server/pkg/httpserver.GoServer).Start | defined in server.go:230" ]
+        
+    }
+
+        subgraph "cluster_log/slog" {
+        style="filled";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+label="log/slog";
+URL="/?f=log/slog";
+penwidth="0.8";
+fontsize="16";
+rank="sink";
+tooltip="package: log/slog";
+        
+        "log/slog.NewTextHandler" [ penwidth="1.5" tooltip="log/slog.NewTextHandler | defined in text_handler.go:28" fillcolor="#adedad" label="NewTextHandler" ]
+        "log/slog.New" [ fillcolor="#adedad" label="New" penwidth="1.5" tooltip="log/slog.New | defined in logger.go:151" ]
+        "(*log/slog.Logger).Info" [ fillcolor="#adedad" label="(*Logger).Info" penwidth="1.5" tooltip="(*log/slog.Logger).Info | defined in logger.go:208" ]
+        "(*log/slog.Logger).Error" [ fillcolor="#adedad" label="(*Logger).Error" penwidth="1.5" tooltip="(*log/slog.Logger).Error | defined in logger.go:228" ]
+        
+    }
+
+        subgraph "cluster_net/http" {
+        fontsize="16";
+style="filled";
+fontname="Tahoma bold";
+rank="sink";
+label="net/http";
+URL="/?f=net/http";
+tooltip="package: net/http";
+penwidth="0.8";
+fillcolor="#E0FFE1";
+        
+        "(net/http.HandlerFunc).ServeHTTP" [ fillcolor="#adedad" label="(HandlerFunc).ServeHTTP" penwidth="1.5" tooltip="(net/http.HandlerFunc).ServeHTTP | defined in server.go:2285\nat server.go:2286: calling [go_server/examples/minimal.main$1]" ]
+        "(*net/http.http2serverConn).runHandler" [ label="(*http2serverConn).runHandler" penwidth="0.5" tooltip="(*net/http.http2serverConn).runHandler | defined in h2_bundle.go:6387\nat h2_bundle.go:6412: calling [go_server/examples/minimal.main$1]" fillcolor="#adedad" ]
+        
+    }
+
+        subgraph "cluster_os" {
+        label="os";
+URL="/?f=os";
+penwidth="0.8";
+fontsize="16";
+style="filled";
+fontname="Tahoma bold";
+tooltip="package: os";
+fillcolor="#E0FFE1";
+rank="sink";
+        
+        "os.Exit" [ fillcolor="#adedad" label="Exit" penwidth="1.5" tooltip="os.Exit | defined in proc.go:62" ]
+        
+    }
+
+        subgraph "cluster_reflect" {
+        style="filled";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+rank="sink";
+tooltip="package: reflect";
+penwidth="0.8";
+label="reflect";
+URL="/?f=reflect";
+fontsize="16";
+        
+        "(reflect.Value).Call" [ fillcolor="#adedad" label="(Value).Call" penwidth="1.5" tooltip="(reflect.Value).Call | defined in value.go:366\nat .:0: calling [go_server/examples/minimal.main$1]" ]
+        
+    }
+
+    }
+
+    "(net/http.HandlerFunc).ServeHTTP" -> "go_server/examples/minimal.main$1" [ color="saddlebrown" tooltip="at server.go:2286: calling [go_server/examples/minimal.main$1]" style="dashed" ]
+    "(*net/http.http2serverConn).runHandler" -> "go_server/examples/minimal.main$1" [ style="dashed" color="saddlebrown" tooltip="at h2_bundle.go:6412: calling [go_server/examples/minimal.main$1]" ]
+    "go_server/examples/minimal.main" -> "go_server/pkg/httpserver.NewGoServer" [ color="saddlebrown" tooltip="at main.go:15: calling [go_server/pkg/httpserver.NewGoServer]" ]
+    "go_server/examples/minimal.main" -> "(*go_server/pkg/httpserver.GoServer).RegisterRoute" [ color="saddlebrown" tooltip="at main.go:19: calling [(*go_server/pkg/httpserver.GoServer).RegisterRoute]" ]
+    "go_server/examples/minimal.main" -> "(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes" [ color="saddlebrown" tooltip="at main.go:22: calling [(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes]" ]
+    "go_server/examples/minimal.main" -> "(*log/slog.Logger).Info" [ color="saddlebrown" tooltip="at main.go:24: calling [(*log/slog.Logger).Info]" ]
+    "go_server/examples/minimal.main" -> "(*go_server/pkg/httpserver.GoServer).Start" [ color="saddlebrown" tooltip="at main.go:25: calling [(*go_server/pkg/httpserver.GoServer).Start]" ]
+    "go_server/examples/minimal.main$1" -> "fmt.Fprintln" [ color="saddlebrown" tooltip="at main.go:20: calling [fmt.Fprintln]" ]
+    "go_server/examples/minimal.main" -> "log/slog.NewTextHandler" [ tooltip="at main.go:13: calling [log/slog.NewTextHandler]" color="saddlebrown" ]
+    "go_server/examples/minimal.main" -> "log/slog.New" [ color="saddlebrown" tooltip="at main.go:13: calling [log/slog.New]" ]
+    "go_server/examples/minimal.main" -> "(*log/slog.Logger).Error" [ color="saddlebrown" tooltip="at main.go:26: calling [(*log/slog.Logger).Error]" ]
+    "go_server/examples/minimal.main" -> "os.Exit" [ color="saddlebrown" tooltip="at main.go:27: calling [os.Exit]" ]
+    "(reflect.Value).Call" -> "go_server/examples/minimal.main$1" [ color="saddlebrown" tooltip="at .:0: calling [go_server/examples/minimal.main$1]" ]
+}
