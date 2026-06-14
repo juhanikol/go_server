@@ -245,3 +245,50 @@ func TestDefaultRoutesServeRootStaticHealthAnd404(t *testing.T) {
 		}
 	})
 }
+
+func TestInternalHelpRoutesServeReadOnlyContent(t *testing.T) {
+	server := NewGoServer(ServerConfig{}, testLogger())
+	server.AddDefaultGoServerRoutes()
+
+	t.Run("help", func(t *testing.T) {
+		request := httptest.NewRequest(http.MethodGet, "/__go_server/help", nil)
+		response := httptest.NewRecorder()
+
+		server.activeHandler().ServeHTTP(response, request)
+
+		if response.Code != http.StatusOK {
+			t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+		}
+		if body := response.Body.String(); !strings.Contains(body, "GoServer Help") {
+			t.Fatalf("expected help page, got %q", body)
+		}
+	})
+
+	t.Run("readme", func(t *testing.T) {
+		request := httptest.NewRequest(http.MethodGet, "/__go_server/readme", nil)
+		response := httptest.NewRecorder()
+
+		server.activeHandler().ServeHTTP(response, request)
+
+		if response.Code != http.StatusOK {
+			t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+		}
+		if body := response.Body.String(); !strings.Contains(body, "Server Help") {
+			t.Fatalf("expected readme content, got %q", body)
+		}
+	})
+
+	t.Run("internal-health", func(t *testing.T) {
+		request := httptest.NewRequest(http.MethodGet, "/__go_server/health", nil)
+		response := httptest.NewRecorder()
+
+		server.activeHandler().ServeHTTP(response, request)
+
+		if response.Code != http.StatusOK {
+			t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+		}
+		if body := response.Body.String(); body != "OK" {
+			t.Fatalf("expected health body, got %q", body)
+		}
+	})
+}

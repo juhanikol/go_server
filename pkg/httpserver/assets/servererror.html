@@ -8,19 +8,20 @@
 <body>
     <div class="container">
         <div class="error-banner">
-            <h1>{{.MainHeading}}</h1>
-            <p>{{.ErrorMessage}}</p>
-        </div>
-        
-        <div class="search-section" style="margin-top: 20px; border-left: 4px solid #4CAF50;">
-            <h3>Developer Note:</h3>
-            <p>This is the <strong>GoServer Internal Error Page</strong>.</p>
-            <p>If you see this, ensure your project templates are correctly placed in <code>web/templates/</code>.</p>
-        </div>
-
-        <nav style="margin-top: 30px;">
-            <a href="/" class="btn">Return to Home</a>
-        </nav>
+        <h1>{{.MainHeading}}</h1>
+        <p>{{.ErrorMessage}}</p>
+    </div>
+    <div class="search-section" style="margin-top: 20px; border-left: 4px solid #4CAF50;">
+        <h3>Developer Note:</h3>
+        <p>This is <strong>GoServer Internal Error Page</strong>.</p>
+        <p>If you see this, ensure project templates are correctly placed in <code>web/templates/</code>.</p>
+        <p>You can also open the <a href="/__go_server/help">internal help page</a> for browser-friendly guidance.</p>
+    </div>
+    <nav style="margin-top: 30px;">
+        <a href="/" class="btn">Return to Home</a>
+        <a href="/__go_server/help" class="btn-secondary">Help</a>
+        <a href="/__go_server/readme" class="btn-secondary">README</a>
+    </nav>
     </div>
 </body>
 </html>

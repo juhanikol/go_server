@@ -18,6 +18,7 @@ How to open it:
 
 - Open `http://localhost:8081/` in your browser.
 - To check that the server is running, use `navigate to http://localhost:8081/health`.
+- You can view more technical server help/readme-file at the non-public address: http://localhost:8081/__go_server/help
 
 Edit your page:
 

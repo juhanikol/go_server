@@ -109,11 +109,43 @@ func (GoServer *GoServer) AddDefaultGoServerRoutes() {
 	GoServer.GoServerRouter.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(StaticPath))))
 
 	// GoServer internal embedded assets such as fallback CSS.
+	GoServer.registerInternalHelpRoutes()
 	GoServer.registerInternalAssetRoutes()
 	// SILENT HEALTH CHECK
 	// use only GoServerRouter.HandleFunc instead of GoServer.GoServerHandler.
 	// This avoids the LoggingMiddleware entirely for this path.
 	GoServer.GoServerRouter.HandleFunc("/health", GoServer.HandleHealthCheck())
+	GoServer.GoServerRouter.HandleFunc("/__go_server/health", GoServer.HandleHealthCheck())
+}
+
+// registerInternalHelpRoutes serves read-only browser help content.
+func (GoServer *GoServer) registerInternalHelpRoutes() {
+	GoServer.GoServerRouter.HandleFunc("/__go_server/help", func(ResponseWriter http.ResponseWriter, Request *http.Request) {
+		GoServer.renderEmbeddedTemplateOrFallback(ResponseWriter, "serverhelp.html", GenericTemplateData{
+			PageTitle:    "GoServer Help",
+			MainHeading:  "GoServer Help",
+			DisplayValue: "This server includes read-only internal help for the built-in pages and release package layout.",
+			ErrorMessage: "Use this page to find the embedded help text and the health check.",
+			IsSuccess:    true,
+		}, http.StatusOK)
+	})
+
+	GoServer.GoServerRouter.HandleFunc("/__go_server/readme", func(ResponseWriter http.ResponseWriter, Request *http.Request) {
+		ReadmeBytes, err := readEmbeddedAsset("README.md")
+		if err != nil {
+			GoServer.RenderGoServerError(ResponseWriter, GoServerError{
+				StatusCode:   http.StatusInternalServerError,
+				Title:        "Help Content Missing",
+				Message:      "The embedded help document could not be loaded.",
+				TechnicalErr: err.Error(),
+			})
+			return
+		}
+
+		ResponseWriter.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		ResponseWriter.WriteHeader(http.StatusOK)
+		_, _ = ResponseWriter.Write(ReadmeBytes)
+	})
 }
 
 // registerInternalAssetRoutes serves embedded GoServer-owned assets such as

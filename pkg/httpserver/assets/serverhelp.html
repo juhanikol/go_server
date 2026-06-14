@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{.PageTitle}}</title>
+<link rel="stylesheet" href="/__go_server/static/styles.css">
+</head>
+<body>
+<div class="container">
+<div class="search-section">
+<p class="eyebrow">Internal Help</p>
+<h1>{{.MainHeading}}</h1>
+<p>{{.DisplayValue}}</p>
+{{if .ErrorMessage}}
+<div class="error-banner">
+<p>{{.ErrorMessage}}</p>
+</div>
+{{end}}
+</div>
+<div class="car-grid">
+<div class="car-card">
+<h3>Start</h3>
+<p>Open <code>/</code> for the site, <code>/health</code> for a quick check, or <code>/__go_server/health</code> if you want the reserved namespace.</p>
+</div>
+<div class="car-card">
+<h3>Read the bundled help</h3>
+<p>Open <a href="/__go_server/readme">/__go_server/readme</a> to read the packaged README text from the browser.</p>
+</div>
+<div class="car-card">
+<h3>Files to edit</h3>
+<p>For the release package, edit <code>web/templates/index.html</code> and <code>web/static/styles.css</code>.</p>
+</div>
+</div>
+<nav style="margin-top: 30px;">
+<a href="/" class="btn">Return to Home</a>
+<a href="/__go_server/readme" class="btn-secondary">README</a>
+<a href="/health" class="btn-secondary">Health</a>
+</nav>
+</div>
+</body>
+</html>
