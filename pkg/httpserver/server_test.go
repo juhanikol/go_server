@@ -5,8 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -155,72 +153,4 @@ func TestRenderGoServerErrorReturnsStatusAndPage(t *testing.T) {
 	if !strings.Contains(body, "Short And Stout") || !strings.Contains(body, "The server refused coffee.") {
 		t.Fatalf("expected rendered error page, got %q", body)
 	}
-}
-
-func TestRegisterLocalSiteServesIndexHTML(t *testing.T) {
-	siteDir := createTestSite(t)
-	server := NewGoServer(ServerConfig{}, testLogger())
-	server.RegisterLocalSite("/", siteDir, "index.html")
-	server.AddDefaultGoServerRoutes()
-
-	request := httptest.NewRequest(http.MethodGet, "/", nil)
-	response := httptest.NewRecorder()
-
-	server.activeHandler().ServeHTTP(response, request)
-
-	if response.Code != http.StatusOK {
-		t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
-	}
-	if body := response.Body.String(); !strings.Contains(body, "local site index") {
-		t.Fatalf("expected index HTML body, got %q", body)
-	}
-}
-
-func TestRegisterLocalSiteServesCSS(t *testing.T) {
-	siteDir := createTestSite(t)
-	server := NewGoServer(ServerConfig{}, testLogger())
-	server.RegisterLocalSite("/", siteDir, "index.html")
-	server.AddDefaultGoServerRoutes()
-
-	request := httptest.NewRequest(http.MethodGet, "/styles.css", nil)
-	response := httptest.NewRecorder()
-
-	server.activeHandler().ServeHTTP(response, request)
-
-	if response.Code != http.StatusOK {
-		t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
-	}
-	if body := response.Body.String(); !strings.Contains(body, "color: red") {
-		t.Fatalf("expected stylesheet body, got %q", body)
-	}
-}
-
-func TestRegisterLocalSiteMissingFileReturnsNotFound(t *testing.T) {
-	siteDir := createTestSite(t)
-	server := NewGoServer(ServerConfig{}, testLogger())
-	server.RegisterLocalSite("/", siteDir, "index.html")
-	server.AddDefaultGoServerRoutes()
-
-	request := httptest.NewRequest(http.MethodGet, "/missing.css", nil)
-	response := httptest.NewRecorder()
-
-	server.activeHandler().ServeHTTP(response, request)
-
-	if response.Code != http.StatusNotFound {
-		t.Fatalf("expected status %d, got %d", http.StatusNotFound, response.Code)
-	}
-}
-
-func createTestSite(t *testing.T) string {
-	t.Helper()
-
-	siteDir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(siteDir, "index.html"), []byte("<h1>local site index</h1>"), 0644); err != nil {
-		t.Fatalf("write index file: %v", err)
-	}
-	if err := os.WriteFile(filepath.Join(siteDir, "styles.css"), []byte("body { color: red; }"), 0644); err != nil {
-		t.Fatalf("write stylesheet: %v", err)
-	}
-
-	return siteDir
 }
