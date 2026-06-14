@@ -91,6 +91,42 @@ func TestLoadAndMergeConfigAcceptsStringLogLevel(t *testing.T) {
 	}
 }
 
+func TestLoadAndMergeConfigAcceptsSupportedLogLevels(t *testing.T) {
+	testCases := []struct {
+		name      string
+		logLevel  string
+		wantLevel slog.Level
+	}{
+		{name: "debug", logLevel: "DEBUG", wantLevel: slog.LevelDebug},
+		{name: "info", logLevel: "INFO", wantLevel: slog.LevelInfo},
+		{name: "warn", logLevel: "WARN", wantLevel: slog.LevelWarn},
+		{name: "error", logLevel: "ERROR", wantLevel: slog.LevelError},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			dir := chdirTemp(t)
+
+			configJSON := []byte(`{
+				"server_address": ":8081",
+				"log_level": "` + testCase.logLevel + `",
+				"template_dir": "web/templates"
+			}`)
+			if err := os.WriteFile(filepath.Join(dir, "server.json"), configJSON, 0644); err != nil {
+				t.Fatalf("write valid config: %v", err)
+			}
+
+			config, err := loadAndMergeConfig(AppConfig{})
+			if err != nil {
+				t.Fatalf("expected config to load: %v", err)
+			}
+			if config.LogLevel != testCase.wantLevel {
+				t.Fatalf("expected log level %v, got %v", testCase.wantLevel, config.LogLevel)
+			}
+		})
+	}
+}
+
 func TestLoadAndMergeConfigMissingFileIsNonFatal(t *testing.T) {
 	chdirTemp(t)
 

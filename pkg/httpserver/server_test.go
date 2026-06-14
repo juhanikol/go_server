@@ -97,6 +97,66 @@ func TestActiveHandlerServesEmbeddedCSS(t *testing.T) {
 	}
 }
 
+func TestActiveHandlerRejectsWrongMethod(t *testing.T) {
+	server := NewGoServer(ServerConfig{}, testLogger())
+	server.RegisterRoute("/post-only", http.MethodPost, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("should not be reached"))
+	})
+
+	request := httptest.NewRequest(http.MethodGet, "/post-only", nil)
+	response := httptest.NewRecorder()
+
+	server.activeHandler().ServeHTTP(response, request)
+
+	if response.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("expected status %d, got %d", http.StatusMethodNotAllowed, response.Code)
+	}
+	if allow := response.Header().Get("Allow"); allow != http.MethodPost {
+		t.Fatalf("expected Allow header %q, got %q", http.MethodPost, allow)
+	}
+	if body := response.Body.String(); !strings.Contains(body, "Method Not Allowed") {
+		t.Fatalf("expected method error body, got %q", body)
+	}
+}
+
+func TestActiveHandlerRecoversFromPanic(t *testing.T) {
+	server := NewGoServer(ServerConfig{}, testLogger())
+	server.RegisterRoute("/panic", http.MethodGet, func(w http.ResponseWriter, r *http.Request) {
+		panic("test panic")
+	})
+
+	request := httptest.NewRequest(http.MethodGet, "/panic", nil)
+	response := httptest.NewRecorder()
+
+	server.activeHandler().ServeHTTP(response, request)
+
+	if response.Code != http.StatusInternalServerError {
+		t.Fatalf("expected status %d, got %d", http.StatusInternalServerError, response.Code)
+	}
+	if body := response.Body.String(); !strings.Contains(body, "System Interruption") {
+		t.Fatalf("expected recovery error page, got %q", body)
+	}
+}
+
+func TestRenderGoServerErrorReturnsStatusAndPage(t *testing.T) {
+	server := NewGoServer(ServerConfig{}, testLogger())
+	response := httptest.NewRecorder()
+
+	server.RenderGoServerError(response, GoServerError{
+		StatusCode: http.StatusTeapot,
+		Title:      "Short And Stout",
+		Message:    "The server refused coffee.",
+	})
+
+	if response.Code != http.StatusTeapot {
+		t.Fatalf("expected status %d, got %d", http.StatusTeapot, response.Code)
+	}
+	body := response.Body.String()
+	if !strings.Contains(body, "Short And Stout") || !strings.Contains(body, "The server refused coffee.") {
+		t.Fatalf("expected rendered error page, got %q", body)
+	}
+}
+
 func TestRegisterLocalSiteServesIndexHTML(t *testing.T) {
 	siteDir := createTestSite(t)
 	server := NewGoServer(ServerConfig{}, testLogger())
