@@ -77,7 +77,7 @@ jobs:
           fi
 
       - name: Upload package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.archive_name }}
           path: dist/${{ matrix.archive_name }}
