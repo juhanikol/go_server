@@ -1,5 +1,24 @@
 # GoServer
 
+## Download
+
+Most users, especially non-technical users, should download a ready-made package from GitHub Releases instead of building from source.
+
+- [Latest Windows build](../../releases/latest/download/go_server-windows.zip)
+- [Latest Linux amd64 build](../../releases/latest/download/go_server-linux-amd64.zip)
+- [Latest Linux arm64 build](../../releases/latest/download/go_server-linux-arm64.zip)
+- [All releases](../../releases)
+
+Quick start:
+
+1. Download the package for your system.
+2. Unzip it.
+3. Edit the HTML/CSS files if you want to change the page, or replace them with your own.
+4. Run `server.exe` on Windows or `./server` on Linux/macOS.
+5. Open `http://localhost:8081` in your browser.
+
+Source code instructions are below for developers who want to run the project from Go source.
+
 GoServer is a small Go HTTP server skeleton and learning project. It is meant to show how a standard-library server can be split into reusable packages, example programs, runtime configuration, and embedded fallback assets.
 
 This project has two intended use cases:
