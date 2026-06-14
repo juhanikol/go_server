@@ -7,10 +7,34 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 func testLogger() *slog.Logger {
 	return slog.New(slog.NewTextHandler(io.Discard, nil))
+}
+
+func TestNewGoServerAppliesTimeouts(t *testing.T) {
+	server := NewGoServer(ServerConfig{
+		ServerAddress:           ":0",
+		ServerReadTimeout:       10 * time.Second,
+		ServerReadHeaderTimeout: 5 * time.Second,
+		ServerWriteTimeout:      20 * time.Second,
+		ServerIdleTimeout:       60 * time.Second,
+	}, testLogger())
+
+	if server.GoServerServing.ReadTimeout != 10*time.Second {
+		t.Fatalf("expected read timeout, got %v", server.GoServerServing.ReadTimeout)
+	}
+	if server.GoServerServing.ReadHeaderTimeout != 5*time.Second {
+		t.Fatalf("expected read header timeout, got %v", server.GoServerServing.ReadHeaderTimeout)
+	}
+	if server.GoServerServing.WriteTimeout != 20*time.Second {
+		t.Fatalf("expected write timeout, got %v", server.GoServerServing.WriteTimeout)
+	}
+	if server.GoServerServing.IdleTimeout != 60*time.Second {
+		t.Fatalf("expected idle timeout, got %v", server.GoServerServing.IdleTimeout)
+	}
 }
 
 func TestActiveHandlerServesRegisteredRouteWhenAllowedHostsEmpty(t *testing.T) {

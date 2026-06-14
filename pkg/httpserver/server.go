@@ -44,10 +44,12 @@ type ProjectManifest struct {
 
 // ServerConfig has basic settings for the HTTP server.
 type ServerConfig struct {
-	ServerAddress      string
-	ServerReadTimeout  time.Duration
-	ServerWriteTimeout time.Duration
-	AllowedHosts       []string
+	ServerAddress           string
+	ServerReadTimeout       time.Duration
+	ServerReadHeaderTimeout time.Duration
+	ServerWriteTimeout      time.Duration
+	ServerIdleTimeout       time.Duration
+	AllowedHosts            []string
 }
 
 // GoServer is the primary orchestrator for the web server.
@@ -74,9 +76,11 @@ func NewGoServer(ServerConfig ServerConfig, GoServerLogger *slog.Logger) *GoServ
 		RegisteredPaths: make(map[string]bool),
 		AllowedHosts:    append([]string(nil), ServerConfig.AllowedHosts...),
 		GoServerServing: &http.Server{
-			Addr:         ServerConfig.ServerAddress,
-			ReadTimeout:  ServerConfig.ServerReadTimeout,
-			WriteTimeout: ServerConfig.ServerWriteTimeout,
+			Addr:              ServerConfig.ServerAddress,
+			ReadTimeout:       ServerConfig.ServerReadTimeout,
+			ReadHeaderTimeout: ServerConfig.ServerReadHeaderTimeout,
+			WriteTimeout:      ServerConfig.ServerWriteTimeout,
+			IdleTimeout:       ServerConfig.ServerIdleTimeout,
 		},
 	}
 }

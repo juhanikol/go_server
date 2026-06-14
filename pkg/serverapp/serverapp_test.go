@@ -54,7 +54,9 @@ func TestLoadAndMergeConfigAcceptsStringLogLevel(t *testing.T) {
 		"env": "test",
 		"root_path": "./",
 		"read_timeout_sec": 15,
+		"read_header_timeout_sec": 7,
 		"write_timeout_sec": 20,
+		"idle_timeout_sec": 45,
 		"shutdown_timeout_sec": 5,
 		"log_file_name": "app.log",
 		"log_max_size_mb": 12,
@@ -85,6 +87,18 @@ func TestLoadAndMergeConfigAcceptsStringLogLevel(t *testing.T) {
 	}
 	if config.TemplateDir != "web/templates" {
 		t.Fatalf("expected template dir to merge, got %q", config.TemplateDir)
+	}
+	if config.ReadTimeout != 15 {
+		t.Fatalf("expected read timeout to merge, got %v", config.ReadTimeout)
+	}
+	if config.ReadHeaderTimeout != 7 {
+		t.Fatalf("expected read header timeout to merge, got %v", config.ReadHeaderTimeout)
+	}
+	if config.WriteTimeout != 20 {
+		t.Fatalf("expected write timeout to merge, got %v", config.WriteTimeout)
+	}
+	if config.IdleTimeout != 45 {
+		t.Fatalf("expected idle timeout to merge, got %v", config.IdleTimeout)
 	}
 	if len(config.AllowedHosts) != 3 {
 		t.Fatalf("expected allowed hosts to merge, got %#v", config.AllowedHosts)
@@ -146,5 +160,17 @@ func TestLoadAndMergeConfigMissingFileIsNonFatal(t *testing.T) {
 	}
 	if config.LogMaxSizeMB != 10 {
 		t.Fatalf("expected default log max size, got %d", config.LogMaxSizeMB)
+	}
+	if config.ReadTimeout != 10 {
+		t.Fatalf("expected default read timeout, got %v", config.ReadTimeout)
+	}
+	if config.ReadHeaderTimeout != 10 {
+		t.Fatalf("expected default read header timeout to match read timeout, got %v", config.ReadHeaderTimeout)
+	}
+	if config.WriteTimeout != 10 {
+		t.Fatalf("expected default write timeout, got %v", config.WriteTimeout)
+	}
+	if config.IdleTimeout != 60 {
+		t.Fatalf("expected default idle timeout, got %v", config.IdleTimeout)
 	}
 }

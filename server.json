@@ -3,6 +3,7 @@
     "env": "development",
     "root_path": "./",
     "read_timeout_sec": 15,
+    "read_header_timeout_sec": 10,
     "write_timeout_sec": 15,
     "idle_timeout_sec": 60,
     "shutdown_timeout_sec": 10,

@@ -41,10 +41,11 @@ type AppConfig struct {
 	RootPath      string `json:"root_path"` // Absolute path to project root
 
 	// Timeout Settings
-	ReadTimeout     time.Duration `json:"read_timeout_sec"`     //
-	WriteTimeout    time.Duration `json:"write_timeout_sec"`    //
-	IdleTimeout     time.Duration `json:"idle_timeout_sec"`     // Time to keep idle connections open
-	ShutdownTimeout time.Duration `json:"shutdown_timeout_sec"` //
+	ReadTimeout       time.Duration `json:"read_timeout_sec"`        //
+	ReadHeaderTimeout time.Duration `json:"read_header_timeout_sec"` // Time to read request headers
+	WriteTimeout      time.Duration `json:"write_timeout_sec"`       //
+	IdleTimeout       time.Duration `json:"idle_timeout_sec"`        // Time to keep idle connections open
+	ShutdownTimeout   time.Duration `json:"shutdown_timeout_sec"`    //
 
 	// Logging & Diagnostics
 	LogFileName  string     `json:"log_file_name"`   //
@@ -108,10 +109,12 @@ func Run(Config AppConfig) error {
 
 	// 4. Initialize Server with values from Config
 	Server := httpserver.NewGoServer(httpserver.ServerConfig{
-		ServerAddress:      Config.ServerAddress,
-		ServerReadTimeout:  time.Duration(Config.ReadTimeout) * time.Second,
-		ServerWriteTimeout: time.Duration(Config.WriteTimeout) * time.Second,
-		AllowedHosts:       Config.AllowedHosts,
+		ServerAddress:           Config.ServerAddress,
+		ServerReadTimeout:       time.Duration(Config.ReadTimeout) * time.Second,
+		ServerReadHeaderTimeout: time.Duration(Config.ReadHeaderTimeout) * time.Second,
+		ServerWriteTimeout:      time.Duration(Config.WriteTimeout) * time.Second,
+		ServerIdleTimeout:       time.Duration(Config.IdleTimeout) * time.Second,
+		AllowedHosts:            Config.AllowedHosts,
 	}, AppLogger)
 
 	// Set Environment and Manifest
@@ -215,8 +218,14 @@ func loadAndMergeConfig(c AppConfig) (AppConfig, error) {
 		if fileConfig.ReadTimeout != 0 {
 			c.ReadTimeout = fileConfig.ReadTimeout
 		}
+		if fileConfig.ReadHeaderTimeout != 0 {
+			c.ReadHeaderTimeout = fileConfig.ReadHeaderTimeout
+		}
 		if fileConfig.WriteTimeout != 0 {
 			c.WriteTimeout = fileConfig.WriteTimeout
+		}
+		if fileConfig.IdleTimeout != 0 {
+			c.IdleTimeout = fileConfig.IdleTimeout
 		}
 		if fileConfig.ShutdownTimeout != 0 {
 			c.ShutdownTimeout = fileConfig.ShutdownTimeout
@@ -251,8 +260,14 @@ func loadAndMergeConfig(c AppConfig) (AppConfig, error) {
 	if c.ReadTimeout == 0 {
 		c.ReadTimeout = 10
 	}
+	if c.ReadHeaderTimeout == 0 {
+		c.ReadHeaderTimeout = c.ReadTimeout
+	}
 	if c.WriteTimeout == 0 {
 		c.WriteTimeout = 10
+	}
+	if c.IdleTimeout == 0 {
+		c.IdleTimeout = 60
 	}
 
 	return c, nil
