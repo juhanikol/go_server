@@ -66,3 +66,30 @@ A change is done only when:
 4. The example server starts.
 5. At least / and /health can be checked manually with curl.
 6. README remains accurate.
+
+## Verification policy
+
+Use the smallest useful verification for the change.
+
+For Go source code changes:
+
+- Run go fmt ./...
+- Run go test ./...
+- Run go vet ./...
+
+For behavior changes that affect startup or routing:
+
+- Also run go run ./cmd/example_server
+- If the server starts, manually check / and /health with curl when practical.
+
+For documentation-only changes:
+
+- Do not run Go commands unless Go source code, go.mod, tests, or runtime configuration changed.
+- Check that documented commands match the current project layout.
+- Clearly report if documented commands were not executed.
+
+For config-only changes:
+
+- Run tests if config parsing tests exist.
+- Run go test ./... if parsing behavior changed.
+- Do not start the server unless the task specifically concerns startup behavior.
