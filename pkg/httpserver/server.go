@@ -219,28 +219,7 @@ func (GoServer *GoServer) SetHomeTemplate(TemplateName string, TemplateData any,
 
 // Start attaches the router and begins listening for requests.
 func (GoServer *GoServer) Start() error {
-	// The primary handler is now a custom function that checks the DomainMap
-	domainAwareHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, exists := GoServer.DomainMap[r.Host]
-		if !exists {
-			// Fallback to the first available manifest or show error
-			GoServer.RenderGoServerError(w, GoServerError{
-				StatusCode: 404,
-				Message:    "Domain not recognized by this server.",
-			})
-			return
-		}
-
-		// Logic: Continue to the project's specific router
-		// (This requires a small structural change to have per-manifest routers)
-	})
-	// CHAINING MIDDLEWARE:
-	// wrap the entire Router in RecoveryMiddleware.
-	// This ensures that even if a route-level middleware panics, we catch it.
-	handler := RecoveryMiddleware(GoServer, domainAwareHandler)
-	handler = LoggingMiddleware(handler) // This ensures everything is logged!
-
-	GoServer.GoServerServing.Handler = handler
+	GoServer.GoServerServing.Handler = GoServer.activeHandler()
 
 	GoServer.GoServerLogger.Info("GoServer is now online", "addr", GoServer.GoServerServing.Addr)
 
@@ -250,6 +229,15 @@ func (GoServer *GoServer) Start() error {
 	}
 
 	return nil
+}
+
+func (GoServer *GoServer) activeHandler() http.Handler {
+	// TODO: Restore multi-domain routing here when DomainMap has a complete
+	// registration and dispatch model. The current single-project flow must
+	// serve the registered router directly.
+	handler := RecoveryMiddleware(GoServer, GoServer.GoServerRouter)
+	handler = LoggingMiddleware(handler)
+	return handler
 }
 
 // Shutdown provides a clean way to stop the server from main.go or runserver.go.

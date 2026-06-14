@@ -9,9 +9,14 @@ import (
 
 func main() {
 	config := serverapp.AppConfig{
+		ServerAddress: ":8081",
+		Env:           "development",
+		RootPath:      ".",
+		TemplateDir:   "web/templates",
+		StaticDir:     "web/static",
 		LogFileName:   "app.log",
 		LogLevel:      slog.LevelInfo,
-		ServerAddress: ":8081",
+		LogMaxSizeMB:  10,
 		// The BuildServer callback is where we bridge the Manifest to the Server instance.
 		BuildServer: func(Server *httpserver.GoServer) error {
 			// 1. Retrieve the manifest from the project
