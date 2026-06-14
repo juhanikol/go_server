@@ -1,0 +1,97 @@
+digraph gocallvis {
+    label="go_server/cmd/example_server";
+    labeljust="l";
+    fontname="Arial";
+    fontsize="14";
+    rankdir="TB";
+    bgcolor="lightgray";
+    style="solid";
+    penwidth="0.5";
+    pad="0.0";
+    nodesep="0.35";
+
+    node [shape="box" style="filled,rounded" fillcolor="honeydew" fontname="Verdana" penwidth="1.0" margin="0.16,0.0"];
+    edge [minlen="2"]
+
+    subgraph "cluster_focus" {
+        bgcolor="#e6ecfa";
+label="main";
+labelloc="t";
+labeljust="c";
+fontsize="18";
+        
+        "go_server/cmd/example_server.main$1" [ fillcolor="lightblue" label="main$1" style="dotted,filled" tooltip="go_server/cmd/example_server.main$1 | defined in main.go:21\nat main.go:35: calling [(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes]\nat main.go:23: calling [go_server/cmd/example_server/myproject.GetManifest]\nat main.go:29: calling [(*go_server/pkg/httpserver.GoServer).ScanProjectResources]\nat main.go:32: calling [(*go_server/pkg/httpserver.GoServer).InterpretManifest]" ]
+        "go_server/cmd/example_server.main" [ label="main" penwidth="0.5" tooltip="go_server/cmd/example_server.main | defined in main.go:10\nat main.go:42: calling [go_server/pkg/serverapp.Run]" fillcolor="lightblue" ]
+        
+        subgraph "cluster_go_server/cmd/example_server/myproject" {
+        fontsize="16";
+style="filled";
+fontname="Tahoma bold";
+rank="sink";
+label="go_server/cmd/example_server/myproject";
+penwidth="0.8";
+fillcolor="#E0FFE1";
+URL="/?f=go_server/cmd/example_server/myproject";
+tooltip="package: go_server/cmd/example_server/myproject";
+        
+        "go_server/cmd/example_server/myproject.GetManifest" [ fillcolor="#adedad" label="GetManifest" penwidth="1.5" tooltip="go_server/cmd/example_server/myproject.GetManifest | defined in myproject.go:10" ]
+        
+    }
+
+        subgraph "cluster_go_server/pkg/httpserver" {
+        fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+rank="sink";
+label="go_server/pkg/httpserver";
+tooltip="package: go_server/pkg/httpserver";
+penwidth="0.8";
+fontsize="16";
+URL="/?f=go_server/pkg/httpserver";
+style="filled";
+        
+        "(*go_server/pkg/httpserver.GoServer).ScanProjectResources" [ tooltip="(*go_server/pkg/httpserver.GoServer).ScanProjectResources | defined in routes.go:50" fillcolor="#adedad" label="(*GoServer).ScanProjectResources" penwidth="1.5" ]
+        "(*go_server/pkg/httpserver.GoServer).InterpretManifest" [ fillcolor="#adedad" label="(*GoServer).InterpretManifest" penwidth="1.5" tooltip="(*go_server/pkg/httpserver.GoServer).InterpretManifest | defined in server.go:133" ]
+        "(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes" [ penwidth="1.5" tooltip="(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes | defined in routes.go:98" fillcolor="#adedad" label="(*GoServer).AddDefaultGoServerRoutes" ]
+        
+    }
+
+        subgraph "cluster_go_server/pkg/serverapp" {
+        URL="/?f=go_server/pkg/serverapp";
+tooltip="package: go_server/pkg/serverapp";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+label="go_server/pkg/serverapp";
+penwidth="0.8";
+fontsize="16";
+style="filled";
+rank="sink";
+        
+        "go_server/pkg/serverapp.Run" [ tooltip="go_server/pkg/serverapp.Run | defined in serverapp.go:80\nat serverapp.go:128: calling [go_server/cmd/example_server.main$1]" fillcolor="#adedad" label="Run" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_reflect" {
+        penwidth="0.8";
+style="filled";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+label="reflect";
+fontsize="16";
+rank="sink";
+URL="/?f=reflect";
+tooltip="package: reflect";
+        
+        "(reflect.Value).Call" [ fillcolor="#adedad" label="(Value).Call" penwidth="1.5" tooltip="(reflect.Value).Call | defined in value.go:366\nat .:0: calling [go_server/cmd/example_server.main$1]" ]
+        
+    }
+
+    }
+
+    "go_server/cmd/example_server.main$1" -> "(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes" [ color="saddlebrown" tooltip="at main.go:35: calling [(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes]" ]
+    "(reflect.Value).Call" -> "go_server/cmd/example_server.main$1" [ tooltip="at .:0: calling [go_server/cmd/example_server.main$1]" color="saddlebrown" ]
+    "go_server/pkg/serverapp.Run" -> "go_server/cmd/example_server.main$1" [ style="dashed" color="saddlebrown" tooltip="at serverapp.go:128: calling [go_server/cmd/example_server.main$1]" ]
+    "go_server/cmd/example_server.main" -> "go_server/pkg/serverapp.Run" [ color="saddlebrown" tooltip="at main.go:42: calling [go_server/pkg/serverapp.Run]" ]
+    "go_server/cmd/example_server.main$1" -> "go_server/cmd/example_server/myproject.GetManifest" [ color="saddlebrown" tooltip="at main.go:23: calling [go_server/cmd/example_server/myproject.GetManifest]" ]
+    "go_server/cmd/example_server.main$1" -> "(*go_server/pkg/httpserver.GoServer).ScanProjectResources" [ color="saddlebrown" tooltip="at main.go:29: calling [(*go_server/pkg/httpserver.GoServer).ScanProjectResources]" ]
+    "go_server/cmd/example_server.main$1" -> "(*go_server/pkg/httpserver.GoServer).InterpretManifest" [ color="saddlebrown" tooltip="at main.go:32: calling [(*go_server/pkg/httpserver.GoServer).InterpretManifest]" ]
+}

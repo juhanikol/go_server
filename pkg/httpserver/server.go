@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"html/template"
 	"log/slog"
+	"net"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -42,9 +44,12 @@ type ProjectManifest struct {
 
 // ServerConfig has basic settings for the HTTP server.
 type ServerConfig struct {
-	ServerAddress      string
-	ServerReadTimeout  time.Duration
-	ServerWriteTimeout time.Duration
+	ServerAddress           string
+	ServerReadTimeout       time.Duration
+	ServerReadHeaderTimeout time.Duration
+	ServerWriteTimeout      time.Duration
+	ServerIdleTimeout       time.Duration
+	AllowedHosts            []string
 }
 
 // GoServer is the primary orchestrator for the web server.
@@ -58,6 +63,7 @@ type GoServer struct {
 	Manifest            ProjectManifest
 	// RegisteredPaths tracks all routes to prevent auto-router collisions.
 	RegisteredPaths map[string]bool
+	AllowedHosts    []string
 	Env             string
 }
 
@@ -68,10 +74,13 @@ func NewGoServer(ServerConfig ServerConfig, GoServerLogger *slog.Logger) *GoServ
 		GoServerRouter:  http.NewServeMux(),
 		TemplateCache:   make(map[string]*template.Template),
 		RegisteredPaths: make(map[string]bool),
+		AllowedHosts:    append([]string(nil), ServerConfig.AllowedHosts...),
 		GoServerServing: &http.Server{
-			Addr:         ServerConfig.ServerAddress,
-			ReadTimeout:  ServerConfig.ServerReadTimeout,
-			WriteTimeout: ServerConfig.ServerWriteTimeout,
+			Addr:              ServerConfig.ServerAddress,
+			ReadTimeout:       ServerConfig.ServerReadTimeout,
+			ReadHeaderTimeout: ServerConfig.ServerReadHeaderTimeout,
+			WriteTimeout:      ServerConfig.ServerWriteTimeout,
+			IdleTimeout:       ServerConfig.ServerIdleTimeout,
 		},
 	}
 }
@@ -219,28 +228,7 @@ func (GoServer *GoServer) SetHomeTemplate(TemplateName string, TemplateData any,
 
 // Start attaches the router and begins listening for requests.
 func (GoServer *GoServer) Start() error {
-	// The primary handler is now a custom function that checks the DomainMap
-	domainAwareHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, exists := GoServer.DomainMap[r.Host]
-		if !exists {
-			// Fallback to the first available manifest or show error
-			GoServer.RenderGoServerError(w, GoServerError{
-				StatusCode: 404,
-				Message:    "Domain not recognized by this server.",
-			})
-			return
-		}
-
-		// Logic: Continue to the project's specific router
-		// (This requires a small structural change to have per-manifest routers)
-	})
-	// CHAINING MIDDLEWARE:
-	// wrap the entire Router in RecoveryMiddleware.
-	// This ensures that even if a route-level middleware panics, we catch it.
-	handler := RecoveryMiddleware(GoServer, domainAwareHandler)
-	handler = LoggingMiddleware(handler) // This ensures everything is logged!
-
-	GoServer.GoServerServing.Handler = handler
+	GoServer.GoServerServing.Handler = GoServer.activeHandler()
 
 	GoServer.GoServerLogger.Info("GoServer is now online", "addr", GoServer.GoServerServing.Addr)
 
@@ -250,6 +238,74 @@ func (GoServer *GoServer) Start() error {
 	}
 
 	return nil
+}
+
+func (GoServer *GoServer) activeHandler() http.Handler {
+	// TODO: Restore multi-domain routing here when DomainMap has a complete
+	// registration and dispatch model. The current single-project flow must
+	// serve the registered router directly.
+	handler := GoServer.hostPolicyMiddleware(GoServer.GoServerRouter)
+	handler = RecoveryMiddleware(GoServer, handler)
+	handler = LoggingMiddleware(handler)
+	return handler
+}
+
+func (GoServer *GoServer) hostPolicyMiddleware(nextHandler http.Handler) http.Handler {
+	allowedHosts := GoServer.normalizedAllowedHosts()
+	if len(allowedHosts) == 0 {
+		return nextHandler
+	}
+
+	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
+		requestHost := normalizeHostForPolicy(request.Host)
+		if allowedHosts[requestHost] {
+			nextHandler.ServeHTTP(responseWriter, request)
+			return
+		}
+
+		GoServer.GoServerLogger.Warn("Rejected request host", "host", request.Host, "normalized_host", requestHost)
+		GoServer.RenderGoServerError(responseWriter, GoServerError{
+			StatusCode:   http.StatusForbidden,
+			Title:        "Host Not Allowed",
+			Message:      "The requested host is not allowed by this server.",
+			TechnicalErr: fmt.Sprintf("rejected host %q", request.Host),
+		})
+	})
+}
+
+func (GoServer *GoServer) normalizedAllowedHosts() map[string]bool {
+	if len(GoServer.AllowedHosts) == 0 {
+		return nil
+	}
+
+	allowedHosts := make(map[string]bool, len(GoServer.AllowedHosts))
+	for _, host := range GoServer.AllowedHosts {
+		normalizedHost := normalizeHostForPolicy(host)
+		if normalizedHost != "" {
+			allowedHosts[normalizedHost] = true
+		}
+	}
+
+	return allowedHosts
+}
+
+func normalizeHostForPolicy(host string) string {
+	host = strings.ToLower(strings.TrimSpace(host))
+	if host == "" {
+		return ""
+	}
+
+	if splitHost, _, err := net.SplitHostPort(host); err == nil {
+		return strings.Trim(splitHost, "[]")
+	}
+
+	if strings.HasPrefix(host, "[") {
+		if end := strings.Index(host, "]"); end > 0 {
+			return host[1:end]
+		}
+	}
+
+	return strings.Trim(host, "[]")
 }
 
 // Shutdown provides a clean way to stop the server from main.go or runserver.go.

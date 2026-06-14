@@ -1,0 +1,84 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - os: windows
+            goos: windows
+            goarch: amd64
+            exe_suffix: .exe
+            archive_name: go-server-windows-amd64.zip
+            archive_format: zip
+          - os: linux
+            goos: linux
+            goarch: amd64
+            exe_suffix: ""
+            archive_name: go-server-linux-amd64.tar.gz
+            archive_format: tar.gz
+          - os: linux
+            goos: linux
+            goarch: arm64
+            exe_suffix: ""
+            archive_name: go-server-linux-arm64.tar.gz
+            archive_format: tar.gz
+          - os: macos
+            goos: darwin
+            goarch: amd64
+            exe_suffix: ""
+            archive_name: go-server-macos-amd64.tar.gz
+            archive_format: tar.gz
+          - os: macos
+            goos: darwin
+            goarch: arm64
+            exe_suffix: ""
+            archive_name: go-server-macos-arm64.tar.gz
+            archive_format: tar.gz
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.25.3
+          cache: true
+
+      - name: Build package
+        shell: bash
+        run: |
+          set -euo pipefail
+          dist_dir="dist"
+          package_dir="$dist_dir/package"
+          archive_path="$dist_dir/${{ matrix.archive_name }}"
+
+          rm -rf "$dist_dir"
+          mkdir -p "$package_dir"
+
+          cp -R release/user-package/. "$package_dir/"
+
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 \
+            go build -trimpath -o "$package_dir/server${{ matrix.exe_suffix }}" ./cmd/example_server
+
+          if [[ "${{ matrix.archive_format }}" == "zip" ]]; then
+            (cd "$package_dir" && zip -qr "../${{ matrix.archive_name }}" .)
+          else
+            tar -C "$package_dir" -czf "$archive_path" .
+          fi
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.archive_name }}
+          path: dist/${{ matrix.archive_name }}
+          if-no-files-found: error

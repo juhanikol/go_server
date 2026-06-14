@@ -1,1 +1,4 @@
 app.log
+.venv-headroom/
+go-callvis
+/bin

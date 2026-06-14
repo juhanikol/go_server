@@ -41,10 +41,11 @@ type AppConfig struct {
 	RootPath      string `json:"root_path"` // Absolute path to project root
 
 	// Timeout Settings
-	ReadTimeout     time.Duration `json:"read_timeout_sec"`     //
-	WriteTimeout    time.Duration `json:"write_timeout_sec"`    //
-	IdleTimeout     time.Duration `json:"idle_timeout_sec"`     // Time to keep idle connections open
-	ShutdownTimeout time.Duration `json:"shutdown_timeout_sec"` //
+	ReadTimeout       time.Duration `json:"read_timeout_sec"`        //
+	ReadHeaderTimeout time.Duration `json:"read_header_timeout_sec"` // Time to read request headers
+	WriteTimeout      time.Duration `json:"write_timeout_sec"`       //
+	IdleTimeout       time.Duration `json:"idle_timeout_sec"`        // Time to keep idle connections open
+	ShutdownTimeout   time.Duration `json:"shutdown_timeout_sec"`    //
 
 	// Logging & Diagnostics
 	LogFileName  string     `json:"log_file_name"`   //
@@ -59,7 +60,7 @@ type AppConfig struct {
 	UseTLS       bool     // Enable HTTPS
 	CertFile     string   // Path to SSL certificate
 	KeyFile      string   // Path to SSL key
-	AllowedHosts []string // List of valid hostnames for security
+	AllowedHosts []string `json:"allowed_hosts"` // List of valid hostnames for security
 
 	// Callback
 	BuildServer func(Server *httpserver.GoServer) error //
@@ -78,7 +79,13 @@ type AppConfig struct {
 // 8. Gracefully shut down with timeout
 func Run(Config AppConfig) error {
 	// 1. Attempt to load from 'server.json' and merge with defaults
-	Config = loadAndMergeConfig(Config)
+	var err error
+	Config, err = loadAndMergeConfig(Config)
+	if err != nil {
+		err = fmt.Errorf("failed loading config: %w", err)
+		fmt.Printf("CRITICAL STARTUP ERROR: %v\n", err)
+		return err
+	}
 
 	// 2. Critical Validation: Stop if core values are missing
 	if err := validateCriticalConfig(Config); err != nil {
@@ -102,9 +109,12 @@ func Run(Config AppConfig) error {
 
 	// 4. Initialize Server with values from Config
 	Server := httpserver.NewGoServer(httpserver.ServerConfig{
-		ServerAddress:      Config.ServerAddress,
-		ServerReadTimeout:  time.Duration(Config.ReadTimeout) * time.Second,
-		ServerWriteTimeout: time.Duration(Config.WriteTimeout) * time.Second,
+		ServerAddress:           Config.ServerAddress,
+		ServerReadTimeout:       time.Duration(Config.ReadTimeout) * time.Second,
+		ServerReadHeaderTimeout: time.Duration(Config.ReadHeaderTimeout) * time.Second,
+		ServerWriteTimeout:      time.Duration(Config.WriteTimeout) * time.Second,
+		ServerIdleTimeout:       time.Duration(Config.IdleTimeout) * time.Second,
+		AllowedHosts:            Config.AllowedHosts,
 	}, AppLogger)
 
 	// Set Environment and Manifest
@@ -154,8 +164,8 @@ func validateCriticalConfig(c AppConfig) error {
 	return nil
 }
 
-func loadAndMergeConfig(c AppConfig) AppConfig {
-	// Try to read server.json from common locations to support zero-boilerplate structures
+func loadAndMergeConfig(c AppConfig) (AppConfig, error) {
+	// Try to read server.json from common locations to support zero-boilerplate structures.
 	configPaths := []string{
 		"server.json",        // Standard root placement
 		"web/server.json",    // Encapsulated web folder placement
@@ -163,46 +173,78 @@ func loadAndMergeConfig(c AppConfig) AppConfig {
 	}
 
 	var data []byte
-	var err error
+	configPath := ""
 	for _, path := range configPaths {
-		if data, err = os.ReadFile(path); err == nil {
+		configData, err := os.ReadFile(path)
+		if err == nil {
+			data = configData
+			configPath = path
 			break
 		}
-	}
-
-	if err == nil {
-		var fileConfig AppConfig
-		if err := json.Unmarshal(data, &fileConfig); err == nil {
-			// Apply file values to the struct if they are not zero
-			if fileConfig.ServerAddress != "" {
-				c.ServerAddress = fileConfig.ServerAddress
-			}
-			if fileConfig.Env != "" {
-				c.Env = fileConfig.Env
-			}
-			if fileConfig.RootPath != "" {
-				c.RootPath = fileConfig.RootPath
-			}
-			if fileConfig.TemplateDir != "" {
-				c.TemplateDir = fileConfig.TemplateDir
-			}
-			if fileConfig.StaticDir != "" {
-				c.StaticDir = fileConfig.StaticDir
-			}
-			if fileConfig.ReadTimeout != 0 {
-				c.ReadTimeout = fileConfig.ReadTimeout
-			}
-			if fileConfig.WriteTimeout != 0 {
-				c.WriteTimeout = fileConfig.WriteTimeout
-			}
-			if fileConfig.ShutdownTimeout != 0 {
-				c.ShutdownTimeout = fileConfig.ShutdownTimeout
-			}
-
+		if !os.IsNotExist(err) {
+			return c, fmt.Errorf("read %s: %w", path, err)
 		}
 	}
 
-	// Apply safe defaults for missing values
+	if configPath != "" {
+		var fileConfig AppConfig
+		var loggingConfig struct {
+			LogLevel *slog.Level `json:"log_level"`
+		}
+
+		if err := json.Unmarshal(data, &fileConfig); err != nil {
+			return c, fmt.Errorf("parse %s: %w", configPath, err)
+		}
+		if err := json.Unmarshal(data, &loggingConfig); err != nil {
+			return c, fmt.Errorf("parse %s log_level: %w", configPath, err)
+		}
+
+		// Apply file values if the struct field is not zero.
+		if fileConfig.ServerAddress != "" {
+			c.ServerAddress = fileConfig.ServerAddress
+		}
+		if fileConfig.Env != "" {
+			c.Env = fileConfig.Env
+		}
+		if fileConfig.RootPath != "" {
+			c.RootPath = fileConfig.RootPath
+		}
+		if fileConfig.TemplateDir != "" {
+			c.TemplateDir = fileConfig.TemplateDir
+		}
+		if fileConfig.StaticDir != "" {
+			c.StaticDir = fileConfig.StaticDir
+		}
+		if fileConfig.ReadTimeout != 0 {
+			c.ReadTimeout = fileConfig.ReadTimeout
+		}
+		if fileConfig.ReadHeaderTimeout != 0 {
+			c.ReadHeaderTimeout = fileConfig.ReadHeaderTimeout
+		}
+		if fileConfig.WriteTimeout != 0 {
+			c.WriteTimeout = fileConfig.WriteTimeout
+		}
+		if fileConfig.IdleTimeout != 0 {
+			c.IdleTimeout = fileConfig.IdleTimeout
+		}
+		if fileConfig.ShutdownTimeout != 0 {
+			c.ShutdownTimeout = fileConfig.ShutdownTimeout
+		}
+		if fileConfig.LogFileName != "" {
+			c.LogFileName = fileConfig.LogFileName
+		}
+		if fileConfig.LogMaxSizeMB != 0 {
+			c.LogMaxSizeMB = fileConfig.LogMaxSizeMB
+		}
+		if loggingConfig.LogLevel != nil {
+			c.LogLevel = *loggingConfig.LogLevel
+		}
+		if len(fileConfig.AllowedHosts) > 0 {
+			c.AllowedHosts = fileConfig.AllowedHosts
+		}
+	}
+
+	// Apply safe defaults for missing values.
 	if c.Env == "" {
 		c.Env = "development"
 	}
@@ -218,9 +260,15 @@ func loadAndMergeConfig(c AppConfig) AppConfig {
 	if c.ReadTimeout == 0 {
 		c.ReadTimeout = 10
 	}
+	if c.ReadHeaderTimeout == 0 {
+		c.ReadHeaderTimeout = c.ReadTimeout
+	}
 	if c.WriteTimeout == 0 {
 		c.WriteTimeout = 10
 	}
+	if c.IdleTimeout == 0 {
+		c.IdleTimeout = 60
+	}
 
-	return c
+	return c, nil
 }

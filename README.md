@@ -1,309 +1,211 @@
-# GO_SERVER
+# GoServer
 
-Modular go server to serve the needs for creating server once in a while. Use as private library or as template to your project.
+## Download
 
-## Features
+Most users, especially non-technical users, should download a ready-made package from GitHub Releases instead of building from source.
 
-* Interface to add routes from other projects without sweat
-* Custom logger to save all logs to file and also stdout
-* save errors and warnings to the logger
-* graceful termination (when Ctrl+C pressed)
-* Decoupling for the api/other endpoints
+- [Latest Windows build](../../releases/latest/download/go-server-windows-amd64.zip)
+- [Latest Linux amd64 build](../../releases/latest/download/go-server-linux-amd64.tar.gz)
+- [Latest Linux arm64 build](../../releases/latest/download/go-server-linux-arm64.tar.gz)
+- [All releases](../../releases)
 
-## Design and technical features
+Quick start:
 
-* **Usage as** : "library"
-* **Usage as template** : having structure to conform go-idioms/standards
-* **One clear constructor** : Developer should only write business logic and let the server compose the outer concerns.
-* **Decoupling** : The server doesn't care *where* data comes from. You could swap the API for a Database without touching `server.go
-* **Safety** : Using `RegisterRoute` in your routes prevents the most beginner mistakes (allow a `DELETE` action on a `GET` request`) and header checks
-* **Logging** : method, path, remote, duration, final status code, bytes written
-* **Fallback/error behaviour** : using premade errorpages for clear error messaging
-* **Global recovery** : panic recovery wrapped around the whole route
+1. Download the package for your system.
+2. Unzip it.
+3. Edit the HTML/CSS files if you want to change the page, or replace them with your own.
+4. Run `server.exe` on Windows or `./server` on Linux/macOS.
+5. Open `http://localhost:8081` in your browser.
 
-## Practical functions
+Source code instructions are below for developers who want to run the project from Go source.
 
-Use these as your working rule set:
+GoServer is a small Go HTTP server skeleton and learning project. It is meant to show how a standard-library server can be split into reusable packages, example programs, runtime configuration, and embedded fallback assets.
 
-* `SetHomeRoute(...)` : for custom homepage handler
-* `SetHomeTemplate(...)` : for simple homepage without custom logic
-* `RegisterRoute(...)` : for normal routes and API endpoints
-* `RenderGoServerHome(...)` : inside homepage handler
-* `RenderGoServerTemplate(...)` : inside other HTML pages
-* `RenderGoServerError(...)` : for explicit 4xx / 5xx pages
+This project has two intended use cases:
 
+1. Developer use: reusable `pkg/` packages and small examples that show how to import and use the server from Go code.
+2. End-user use: a simple executable + `server.json` + `web/templates` + `web/static` flow for serving a local HTML/CSS site.
 
-## Usage
+This is not a production framework.
 
-### Private library
+## Project Background
 
+This project began as a personal learning exercise for understanding Go’s standard library, goroutines, HTTP server behavior, routing, middleware, and HTML template rendering. I intentionally avoided mature third-party routers and frameworks, such as chi, because the goal was to understand the underlying mechanics rather than hide them behind an existing abstraction.
+
+The original idea was to create a lightweight, zero-boilerplate HTTP server that could be started easily from a built executable. One intended use case was a simple local server for beginners or non-specialist users who want to demonstrate HTML/CSS pages without first learning a full web framework or deployment stack. A secondary goal was to make the server small enough to run in a home network or on low-powered single-board computers such as a Raspberry Pi.
+
+As the project grew, it became clear that the codebase needed better boundaries. Several features had been started at the same time, including configuration loading, embedded fallback pages, manifest-based route registration, domain-aware routing, logging, and graceful shutdown. The server had already been running successfully with test pages, but later changes introduced incomplete paths and made the startup flow harder to reason about. I paused the project for a while rather than continue adding features on top of unclear structure.
+
+The current goal is to finish the project as a clean portfolio-quality Go server skeleton. The focus is now on making the example application reliable, keeping the public API small, documenting the actual behavior, and adding tests around the most important server paths.
+
+This cleanup is also being done as a practical exercise in AI-assisted development workflows. I am using Codex together with Headroom CLI to analyze the repository, plan small commits, and improve the codebase without turning the process into a broad uncontrolled rewrite.
+
+## What It Demonstrates
+
+- route registration with the standard library
+- middleware for method checks, logging, and panic recovery
+- structured logging
+- graceful shutdown
+- runtime config loading from JSON
+- embedded fallback pages and embedded static assets
+- serving a real local HTML/CSS page from `web/templates` and `web/static`
+- a reusable import example under `examples/minimal`
+- a folder-based local site example under `examples/html_site`
+
+## Current Status
+
+- `go run ./cmd/example_server` works from the repository root.
+- `/health` returns `OK`.
+- `/` serves the example page when `web/templates/index.html` exists.
+- embedded fallback pages remain in place as safety nets.
+- `/__go_server/static/styles.css` serves the embedded stylesheet.
+- `DomainMap` is not part of the current single-project flow.
+- `AllowedHosts` is opt-in: empty or nil allows all hosts, configured hosts restrict requests.
+- TLS and multi-domain routing are future work.
+
+## Repository Structure
+
+```text
+.
+├── cmd/
+│   └── example_server/
+│       ├── main.go
+│       └── myproject/
+│           └── myproject.go
+├── examples/
+│   ├── html_site/
+│   │   ├── README.md
+│   │   ├── main.go
+│   │   └── site/
+│   │       ├── index.html
+│   │       └── styles.css
+│   └── minimal/
+│       └── main.go
+├── pkg/
+│   ├── httpserver/
+│   │   ├── assets/
+│   │   │   ├── README.md
+│   │   │   ├── servererror.html
+│   │   │   ├── serverindex.html
+│   │   │   └── styles.css
+│   │   ├── embed.go
+│   │   ├── errors.go
+│   │   ├── middleware.go
+│   │   ├── routes.go
+│   │   ├── server.go
+│   │   └── server_test.go
+│   └── serverapp/
+│       ├── config.go
+│       ├── serverapp.go
+│       └── serverapp_test.go
+├── server.json
+├── web/
+│   ├── static/
+│   │   └── styles.css
+│   └── templates/
+│       └── index.html
+├── go.mod
+├── README.md
+└── AGENTS.md
 ```
-go get "gitea.com/this address will be updated"
+
+## Quick Start
+
+From the repository root:
+
+```bash
+go run ./cmd/example_server
 ```
 
-create a struct in your new project that implements the GoServerRouteRegisterer interface in routes.go
+Then open:
 
-
-### The "Go Workspace" Approach (go.work)
-
-If you have multiple projects locally (e.g., Project_A and Go_Modular_Server) and you don't want to push to GitHub yet, use a Go Workspace.
-
-How: Create a go.work file in your root folder:
-
+```text
+http://localhost:8081/
 ```
 
-Go
-go 1.25.3
-use (
-./Go_Modular_Server
-./Project_A
-)
+## Manual Checks
+
+```bash
+curl -i http://localhost:8081/
+curl -i http://localhost:8081/health
+curl -i http://localhost:8081/__go_server/static/styles.css
 ```
+
+## Development Commands
+
+```bash
+go fmt ./...
+go test ./...
+go vet ./...
+go run ./cmd/example_server
+```
+
+The repository also has a basic CI gate in `.github/workflows/ci.yml` that runs `go test ./...`, `go vet ./...`, and `govulncheck ./...` on push and pull requests.
 
 ## Examples
 
-#### A normal project route
+### `examples/minimal`
 
-Developer writes only the logic:
+Demonstrates importing `pkg/httpserver` from another Go program and registering a route directly in code.
 
-```
-func HandleDashboard(ResponseWriter http.ResponseWriter, Request *http.Request) {
-	ResponseWriter.Write([]byte("Dashboard page"))
-}
-```
+Run:
 
-Then register it
-
-```
-GoServerInstance.RegisterRoute("/dashboard", http.MethodGet, HandleDashboard)
+```bash
+go run ./examples/minimal
 ```
 
-#### A homepage handler
+Open:
 
-Homepage can still be set separately, because homepage has special fallback behavior:
-
-```
-GoServerInstance.SetHomeRoute(func(ResponseWriter http.ResponseWriter, Request *http.Request) {
-	Data := httpserver.GenericTemplateData{
-		PageTitle:    "My App Home",
-		MainHeading:  "Welcome",
-		DisplayValue: "This homepage belongs to the project.",
-		IsSuccess:    true,
-	}
-
-	GoServerInstance.RenderGoServerHome(ResponseWriter, "index.html", Data, http.StatusOK)
-})
+```text
+http://localhost:8082/hello
 ```
 
-#### A simple homepage without custom logic
+### `examples/html_site`
 
-```
-GoServerInstance.SetHomeTemplate(
-	"index.html",
-	httpserver.GenericTemplateData{
-		PageTitle:    "My App Home",
-		MainHeading:  "Welcome",
-		DisplayValue: "Configured with SetHomeTemplate.",
-		IsSuccess:    true,
-	},
-	http.StatusOK,
-)
+Demonstrates the beginner-friendly local site flow: point the example at a folder of HTML/CSS files and run it locally.
+
+Run:
+
+```bash
+go run ./examples/html_site
 ```
 
-That is the shortest way to define a homepage.
+Open:
 
-#### An API route
-
-```
-func HandlePing(ResponseWriter http.ResponseWriter, Request *http.Request) {
-	ResponseWriter.Header().Set("Content-Type", "application/json")
-	ResponseWriter.WriteHeader(http.StatusOK)
-	ResponseWriter.Write([]byte(`{"status":"ok"}`))
-}
-
-GoServerInstance.RegisterRoute("/api/ping", http.MethodGet, HandlePing)
+```text
+http://localhost:8083/
 ```
 
-This keeps API routes project-owned
+## Configuration Overview
 
-#### Example of full usage in a module
+The repository includes a sample `server.json` at the root. It documents the current runtime knobs used by the example server and future executable-based deployments.
 
-A simple external module could look like this:
+Common fields include:
 
-```
-package mymodule
+- `server_address`
+- `root_path`
+- `template_dir`
+- `static_dir`
+- `allowed_hosts`
+- `read_timeout_sec`
+- `read_header_timeout_sec`
+- `write_timeout_sec`
+- `idle_timeout_sec`
+- `shutdown_timeout_sec`
+- `log_file_name`
+- `log_level`
 
-import (
-	"net/http"
+The current `cmd/example_server/main.go` also sets matching defaults directly so the documented `go run ./cmd/example_server` command works from the repository root.
 
-	"go_server/internal/httpserver"
-)
+## Why There Are Two README Files
 
-type MyModule struct{}
+This root `README.md` is for GitHub visitors, contributors, reviewers, and portfolio readers. It can mention examples, package boundaries, config shape, and project status.
 
-func (Module *MyModule) RegisterGoServerRoutes(GoServer *httpserver.GoServer) {
-	GoServer.SetHomeRoute(Module.HandleHome(GoServer))
-	GoServer.RegisterRoute("/dashboard", http.MethodGet, Module.HandleDashboard(GoServer))
-	GoServer.RegisterRoute("/api/ping", http.MethodGet, Module.HandlePing())
-}
+`pkg/httpserver/assets/README.md` is different: it is embedded into the built server and should stay short, practical, and user-facing. It is meant to help someone who already has the executable running.
 
-func (Module *MyModule) HandleHome(GoServer *httpserver.GoServer) http.HandlerFunc {
-	return func(ResponseWriter http.ResponseWriter, Request *http.Request) {
-		Data := httpserver.GenericTemplateData{
-			PageTitle:    "My Module Home",
-			MainHeading:  "Welcome to My Module",
-			DisplayValue: "This is the custom homepage from an external module.",
-			IsSuccess:    true,
-		}
+## Known Limitations
 
-		GoServer.RenderGoServerHome(ResponseWriter, "index.html", Data, http.StatusOK)
-	}
-}
-
-func (Module *MyModule) HandleDashboard(GoServer *httpserver.GoServer) http.HandlerFunc {
-	return func(ResponseWriter http.ResponseWriter, Request *http.Request) {
-		Data := httpserver.GenericTemplateData{
-			PageTitle:    "Dashboard",
-			MainHeading:  "Dashboard",
-			DisplayValue: "Project dashboard content.",
-			IsSuccess:    true,
-		}
-
-		GoServer.RenderGoServerTemplate(ResponseWriter, "dashboard.html", Data, http.StatusOK)
-	}
-}
-
-func (Module *MyModule) HandlePing() http.HandlerFunc {
-	return func(ResponseWriter http.ResponseWriter, Request *http.Request) {
-		ResponseWriter.Header().Set("Content-Type", "application/json")
-		ResponseWriter.WriteHeader(http.StatusOK)
-		ResponseWriter.Write([]byte(`{"status":"ok"}`))
-	}
-}
-```
-
-
-`GoServerRouteRegisterer` interface. This allows an entirely different project to "plug in" to this modular server.
-
-Imagine you have a new project called **"InventoryModule"** . You don't want to change the `go_server` code; you just want to add inventory routes to it.
-
-File: `external_project/inventory.go`
-
-**Bash**
-
-```
-package inventory
-
-import (
-	"fmt"
-	"net/http"
-
-	// Import your modular server
-	"go_server/internal/httpserver"
-)
-
-// InventoryPlugin implementing the GoServerRouteRegisterer interface
-type InventoryPlugin struct {
-	Name string
-}
-
-// RegisterGoServerRoutes is the required method for the interface.
-// It allows this external module to inject its own logic into GoServer.
-func (IP *InventoryPlugin) RegisterGoServerRoutes(GS *httpserver.GoServer) {
-	GS.GoServerLogger.Info("Registering external Inventory Plugin", "module", IP.Name)
-
-	// Add a new route using the modular server's handler
-	GS.GoServerHandler("/inventory", httpserver.MethodMiddleware(http.MethodGet, IP.HandleInventoryList()))
-}
-
-func (IP *InventoryPlugin) HandleInventoryList() http.HandlerFunc {
-	return func(RW http.ResponseWriter, R *http.Request) {
-		fmt.Fprintf(RW, "Welcome to the %s inventory list!", IP.Name)
-	}
-}
-```
-
-**How to trigger this in `runserver.go`:**
-In `runserver.go`--> run(), you would simply add one line after initializing the server:
-
-```
-InventoryModule := &inventory.InventoryPlugin{Name: "Warehouse-Alpha"}
-InventoryModule.RegisterGoServerRoutes(GoServerInstance)
-```
-
-## Project Structure (WIP)
-
-* **main.go** : The entry point for the Go-based Web Server.
-* **api/** : Shared API models for entire server.
-* **internal/httpserver/** : Implementation of the HTTP server, including routes, handlers, and the `renderTemplate` engine.
-* **internal/services/api1/** : The `apicaller.go` service responsible for external API communication.
-* **static/** : Contains HTML files (`index.html`, `details.html`, `compare.html`) and CSS styles.
-
-## USAGE
-
-This is the important usage rule:
-
-* for homepage route /: use RenderGoServerHome(...)
-* for all other HTML pages: use RenderGoServerTemplate(...)
-* for explicit 4xx / 5xx: use RenderGoServerError(...)
-
-That lets the project define pages without changing the server code
-
-## USAGE EXAMPLES
-
-Example homepage in external module
-
-```
-func (App *MyModule) HandleHome(GS *httpserver.GoServer) http.HandlerFunc {
-	return func(ResponseWriter http.ResponseWriter, Request *http.Request) {
-		Data := httpserver.GenericTemplateData{
-			PageTitle:    "My App Home",
-			MainHeading:  "Welcome",
-			DisplayValue: "This page belongs to the project, not the GoServer core.",
-			IsSuccess:    true,
-		}
-
-		GS.RenderGoServerHome(ResponseWriter, "index.html", Data, http.StatusOK)
-	}
-}
-```
-
-Example other page:
-
-```
-func (App *MyModule) HandleDashboard(GS *httpserver.GoServer) http.HandlerFunc {
-	return func(ResponseWriter http.ResponseWriter, Request *http.Request) {
-		Data := DashboardData{
-			Title: "Dashboard",
-		}
-
-		GS.RenderGoServerTemplate(ResponseWriter, "dashboard.html", Data, http.StatusOK)
-	}
-}
-```
-
-Example explicit 404:
-
-```
-GS.RenderGoServerError(ResponseWriter, httpserver.GoServerError{
-	StatusCode:   http.StatusNotFound,
-	Title:        "Page Not Found",
-	Message:      "The requested resource does not exist.",
-	TechnicalErr: "No matching route or record",
-})
-```
-
-external project module should register something like this:
-
-```
-func (App *MyModule) RegisterGoServerRoutes(GS *httpserver.GoServer) {
-	GS.GoServerHandler("/", httpserver.MethodMiddleware(http.MethodGet, App.HandleHome(GS)))
-	GS.GoServerHandler("/dashboard", httpserver.MethodMiddleware(http.MethodGet, App.HandleDashboard(GS)))
-}
-```
-
-And the homepage handler should use `RenderGoServerHome(...)`, because homepage failure should fall back to `serverindex.html`, not directly to the generic error page.
-
-## Authors
-
-* **Juhani Kolehmainen** (Juhani.kolehmainen@gmail.com
+- `DomainMap` is future work and not part of the current single-project request flow.
+- TLS support is not a completed end-user feature yet.
+- `AllowedHosts` is opt-in rather than a default restriction.
+- The project is still a learning skeleton, not a hardened production framework.

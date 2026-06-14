@@ -1,0 +1,208 @@
+digraph gocallvis {
+    label="go_server/examples/html_site";
+    labeljust="l";
+    fontname="Arial";
+    fontsize="14";
+    rankdir="TB";
+    bgcolor="lightgray";
+    style="solid";
+    penwidth="0.5";
+    pad="0.0";
+    nodesep="0.35";
+
+    node [shape="box" style="filled,rounded" fillcolor="honeydew" fontname="Verdana" penwidth="1.0" margin="0.16,0.0"];
+    edge [minlen="2"]
+
+    subgraph "cluster_focus" {
+        bgcolor="#e6ecfa";
+label="main";
+labelloc="t";
+labeljust="c";
+fontsize="18";
+        
+        "go_server/examples/html_site.registerLocalSite$1" [ label="registerLocalSite$1" style="dotted,filled" tooltip="go_server/examples/html_site.registerLocalSite$1 | defined in main.go:37\nat main.go:38: calling [path/filepath.Join]\nat main.go:38: calling [net/http.ServeFile]" fillcolor="lightblue" ]
+        "go_server/examples/html_site.registerLocalSite$2" [ fillcolor="lightblue" label="registerLocalSite$2" style="dotted,filled" tooltip="go_server/examples/html_site.registerLocalSite$2 | defined in main.go:41\nat main.go:43: calling [(*net/http.ServeMux).findHandler$1]\nat main.go:43: calling [(net/http.globalOptionsHandler).ServeHTTP]\nat main.go:43: calling [go_server/examples/html_site.registerLocalSite$1]\nat main.go:46: calling [(net/http.initALPNRequest).ServeHTTP]\nat main.go:46: calling [(net/http.serverHandler).ServeHTTP]\nat main.go:43: calling [(net/http.initALPNRequest).ServeHTTP]\nat main.go:43: calling [(*net/http.ServeMux).ServeHTTP]\nat main.go:43: calling [go_server/pkg/httpserver.MethodMiddleware$1]\nat main.go:43: calling [(net/http.unencryptedHTTP2Request).ServeHTTP]\nat main.go:46: calling [(net/http.globalOptionsHandler).ServeHTTP]\nat main.go:43: calling [(net/http.HandlerFunc).ServeHTTP]\nat main.go:46: calling [(*net/http.redirectHandler).ServeHTTP]\nat main.go:43: calling [net/http.StripPrefix$1]\nat main.go:46: calling [(*net/http.ServeMux).ServeHTTP]\nat main.go:43: calling [(net/http.serverHandler).ServeHTTP]\nat main.go:43: calling [(*net/http.redirectHandler).ServeHTTP]\nat main.go:43: calling [go_server/pkg/httpserver.RecoveryMiddleware$1]\nat main.go:43: calling [(*go_server/pkg/httpserver.GoServer).HandleDefaultLandingPage$1]\nat main.go:43: calling [go_server/pkg/httpserver.LoggingMiddleware$1]\nat main.go:43: calling [(*go_server/pkg/httpserver.GoServer).hostPolicyMiddleware$1]\nat main.go:43: calling [net/http.NotFound]\nat main.go:43: calling [(net/http.noopHandler).ServeHTTP]\nat main.go:43: calling [go_server/examples/html_site.registerLocalSite$2]\nat main.go:43: calling [(*go_server/pkg/httpserver.GoServer).ensureHomeRoute$1]\nat main.go:43: calling [net/http.http2handleHeaderListTooLong]\nat main.go:46: calling [(net/http.unencryptedHTTP2Request).ServeHTTP]\nat main.go:46: calling [(*net/http.fileHandler).ServeHTTP]\nat main.go:46: calling [(net/http.HandlerFunc).ServeHTTP]\nat main.go:43: calling [net/http.http2new400Handler$1]\nat main.go:43: calling [(*net/http.fileHandler).ServeHTTP]\nat main.go:46: calling [(net/http.noopHandler).ServeHTTP]\nat main.go:43: calling [(*go_server/pkg/httpserver.GoServer).HandleHealthCheck$1]" ]
+        "go_server/examples/html_site.registerLocalSite" [ fillcolor="lightblue" label="registerLocalSite" penwidth="0.5" tooltip="go_server/examples/html_site.registerLocalSite | defined in main.go:31\nat main.go:41: calling [(*go_server/pkg/httpserver.GoServer).SetHomeRoute]\nat main.go:36: calling [net/http.FileServer]" ]
+        "go_server/examples/html_site.main" [ fillcolor="lightblue" label="main" penwidth="0.5" tooltip="go_server/examples/html_site.main | defined in main.go:14\nat main.go:26: calling [(*log/slog.Logger).Error]\nat main.go:25: calling [(*go_server/pkg/httpserver.GoServer).Start]\nat main.go:15: calling [log/slog.NewTextHandler]\nat main.go:24: calling [(*log/slog.Logger).Info]\nat main.go:15: calling [log/slog.New]\nat main.go:27: calling [os.Exit]\nat main.go:17: calling [go_server/pkg/httpserver.NewGoServer]\nat main.go:21: calling [go_server/examples/html_site.registerLocalSite]\nat main.go:22: calling [(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes]" ]
+        
+        subgraph "cluster_go_server/pkg/httpserver" {
+        style="filled";
+fontname="Tahoma bold";
+URL="/?f=go_server/pkg/httpserver";
+tooltip="package: go_server/pkg/httpserver";
+fontsize="16";
+fillcolor="#E0FFE1";
+rank="sink";
+label="go_server/pkg/httpserver";
+penwidth="0.8";
+        
+        "(*go_server/pkg/httpserver.GoServer).ensureHomeRoute$1" [ fillcolor="#adedad" label="(*GoServer).ensureHomeRoute$1" style="dotted,filled" tooltip="(*go_server/pkg/httpserver.GoServer).ensureHomeRoute$1 | defined in routes.go:144" ]
+        "(*go_server/pkg/httpserver.GoServer).HandleHealthCheck$1" [ style="dotted,filled" tooltip="(*go_server/pkg/httpserver.GoServer).HandleHealthCheck$1 | defined in routes.go:436" fillcolor="#adedad" label="(*GoServer).HandleHealthCheck$1" ]
+        "(*go_server/pkg/httpserver.GoServer).HandleDefaultLandingPage$1" [ fillcolor="#adedad" label="(*GoServer).HandleDefaultLandingPage$1" style="dotted,filled" tooltip="(*go_server/pkg/httpserver.GoServer).HandleDefaultLandingPage$1 | defined in routes.go:158" ]
+        "go_server/pkg/httpserver.LoggingMiddleware$1" [ fillcolor="#adedad" label="LoggingMiddleware$1" style="dotted,filled" tooltip="go_server/pkg/httpserver.LoggingMiddleware$1 | defined in middleware.go:74\nat middleware.go:86: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+        "(*go_server/pkg/httpserver.GoServer).hostPolicyMiddleware$1" [ label="(*GoServer).hostPolicyMiddleware$1" style="dotted,filled" tooltip="(*go_server/pkg/httpserver.GoServer).hostPolicyMiddleware$1 | defined in server.go:259\nat server.go:262: calling [(net/http.HandlerFunc).ServeHTTP]" fillcolor="#adedad" ]
+        "go_server/pkg/httpserver.RecoveryMiddleware$1" [ fillcolor="#adedad" label="RecoveryMiddleware$1" style="dotted,filled" tooltip="go_server/pkg/httpserver.RecoveryMiddleware$1 | defined in middleware.go:105\nat middleware.go:126: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+        "go_server/pkg/httpserver.MethodMiddleware$1" [ label="MethodMiddleware$1" style="dotted,filled" tooltip="go_server/pkg/httpserver.MethodMiddleware$1 | defined in middleware.go:50\nat middleware.go:65: calling [(net/http.HandlerFunc).ServeHTTP]" fillcolor="#adedad" ]
+        "(*go_server/pkg/httpserver.GoServer).SetHomeRoute" [ fillcolor="#adedad" label="(*GoServer).SetHomeRoute" penwidth="1.5" tooltip="(*go_server/pkg/httpserver.GoServer).SetHomeRoute | defined in server.go:206" ]
+        "go_server/pkg/httpserver.NewGoServer" [ label="NewGoServer" penwidth="1.5" tooltip="go_server/pkg/httpserver.NewGoServer | defined in server.go:71" fillcolor="#adedad" ]
+        "(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes" [ fillcolor="#adedad" label="(*GoServer).AddDefaultGoServerRoutes" penwidth="1.5" tooltip="(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes | defined in routes.go:98" ]
+        "(*go_server/pkg/httpserver.GoServer).Start" [ penwidth="1.5" tooltip="(*go_server/pkg/httpserver.GoServer).Start | defined in server.go:230" fillcolor="#adedad" label="(*GoServer).Start" ]
+        
+    }
+
+        subgraph "cluster_log/slog" {
+        penwidth="0.8";
+label="log/slog";
+tooltip="package: log/slog";
+fontsize="16";
+style="filled";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+rank="sink";
+URL="/?f=log/slog";
+        
+        "log/slog.NewTextHandler" [ fillcolor="#adedad" label="NewTextHandler" penwidth="1.5" tooltip="log/slog.NewTextHandler | defined in text_handler.go:28" ]
+        "log/slog.New" [ penwidth="1.5" tooltip="log/slog.New | defined in logger.go:151" fillcolor="#adedad" label="New" ]
+        "(*log/slog.Logger).Info" [ tooltip="(*log/slog.Logger).Info | defined in logger.go:208" fillcolor="#adedad" label="(*Logger).Info" penwidth="1.5" ]
+        "(*log/slog.Logger).Error" [ fillcolor="#adedad" label="(*Logger).Error" penwidth="1.5" tooltip="(*log/slog.Logger).Error | defined in logger.go:228" ]
+        
+    }
+
+        subgraph "cluster_net/http" {
+        penwidth="0.8";
+style="filled";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+label="net/http";
+URL="/?f=net/http";
+tooltip="package: net/http";
+fontsize="16";
+rank="sink";
+        
+        "net/http.ServeFile" [ tooltip="net/http.ServeFile | defined in fs.go:814" fillcolor="#adedad" label="ServeFile" penwidth="1.5" ]
+        "(net/http.HandlerFunc).ServeHTTP" [ tooltip="(net/http.HandlerFunc).ServeHTTP | defined in server.go:2285\nat server.go:2286: calling [(net/http.HandlerFunc).ServeHTTP]\nat server.go:2286: calling [go_server/examples/html_site.registerLocalSite$2]\nat server.go:2286: calling [go_server/examples/html_site.registerLocalSite$1]" fillcolor="#adedad" label="(HandlerFunc).ServeHTTP" penwidth="1.5" ]
+        "net/http.http2new400Handler$1" [ fillcolor="#adedad" label="http2new400Handler$1" style="dotted,filled" tooltip="net/http.http2new400Handler$1 | defined in h2_bundle.go:7284" ]
+        "(*net/http.fileHandler).ServeHTTP" [ tooltip="(*net/http.fileHandler).ServeHTTP | defined in fs.go:988" fillcolor="#adedad" label="(*fileHandler).ServeHTTP" penwidth="1.5" ]
+        "(net/http.noopHandler).ServeHTTP" [ fillcolor="#adedad" label="(noopHandler).ServeHTTP" penwidth="1.5" tooltip="(net/http.noopHandler).ServeHTTP | defined in csrf.go:82" ]
+        "net/http.StripPrefix$1" [ fillcolor="#adedad" label="StripPrefix$1" style="dotted,filled" tooltip="net/http.StripPrefix$1 | defined in server.go:2338\nat server.go:2348: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+        "(*net/http.ServeMux).ServeHTTP" [ fillcolor="#adedad" label="(*ServeMux).ServeHTTP" penwidth="1.5" tooltip="(*net/http.ServeMux).ServeHTTP | defined in server.go:2814\nat server.go:2828: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+        "net/http.http2handleHeaderListTooLong" [ fillcolor="#adedad" label="http2handleHeaderListTooLong" penwidth="0.5" tooltip="net/http.http2handleHeaderListTooLong | defined in h2_bundle.go:6416" ]
+        "(net/http.initALPNRequest).ServeHTTP" [ fillcolor="#adedad" label="(initALPNRequest).ServeHTTP" penwidth="1.5" tooltip="(net/http.initALPNRequest).ServeHTTP | defined in server.go:3973" ]
+        "(net/http.unencryptedHTTP2Request).ServeHTTP" [ penwidth="1.5" tooltip="(net/http.unencryptedHTTP2Request).ServeHTTP | defined in server.go:2129" fillcolor="#adedad" label="(unencryptedHTTP2Request).ServeHTTP" ]
+        "(net/http.serverHandler).ServeHTTP" [ tooltip="(net/http.serverHandler).ServeHTTP | defined in server.go:3302\nat server.go:3311: calling [(net/http.HandlerFunc).ServeHTTP]" fillcolor="#adedad" label="(serverHandler).ServeHTTP" penwidth="1.5" ]
+        "(*net/http.ServeMux).findHandler$1" [ fillcolor="#adedad" label="(*ServeMux).findHandler$1" style="dotted,filled" tooltip="(*net/http.ServeMux).findHandler$1 | defined in server.go:2705" ]
+        "(net/http.globalOptionsHandler).ServeHTTP" [ fillcolor="#adedad" label="(globalOptionsHandler).ServeHTTP" penwidth="1.5" tooltip="(net/http.globalOptionsHandler).ServeHTTP | defined in server.go:3945" ]
+        "(*net/http.redirectHandler).ServeHTTP" [ penwidth="1.5" tooltip="(*net/http.redirectHandler).ServeHTTP | defined in server.go:2442" fillcolor="#adedad" label="(*redirectHandler).ServeHTTP" ]
+        "net/http.NotFound" [ fillcolor="#adedad" label="NotFound" penwidth="1.5" tooltip="net/http.NotFound | defined in server.go:2322" ]
+        "(*net/http.http2serverConn).runHandler" [ fillcolor="#adedad" label="(*http2serverConn).runHandler" penwidth="0.5" tooltip="(*net/http.http2serverConn).runHandler | defined in h2_bundle.go:6387\nat h2_bundle.go:6412: calling [go_server/examples/html_site.registerLocalSite$1]\nat h2_bundle.go:6412: calling [go_server/examples/html_site.registerLocalSite$2]" ]
+        "net/http.FileServer" [ penwidth="1.5" tooltip="net/http.FileServer | defined in fs.go:971" fillcolor="#adedad" label="FileServer" ]
+        
+    }
+
+        subgraph "cluster_os" {
+        fillcolor="#E0FFE1";
+rank="sink";
+URL="/?f=os";
+tooltip="package: os";
+penwidth="0.8";
+style="filled";
+fontname="Tahoma bold";
+label="os";
+fontsize="16";
+        
+        "os.Exit" [ fillcolor="#adedad" label="Exit" penwidth="1.5" tooltip="os.Exit | defined in proc.go:62" ]
+        
+    }
+
+        subgraph "cluster_path/filepath" {
+        penwidth="0.8";
+fontsize="16";
+style="filled";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+rank="sink";
+label="path/filepath";
+URL="/?f=path/filepath";
+tooltip="package: path/filepath";
+        
+        "path/filepath.Join" [ penwidth="1.5" tooltip="path/filepath.Join | defined in path.go:130" fillcolor="#adedad" label="Join" ]
+        
+    }
+
+        subgraph "cluster_reflect" {
+        label="reflect";
+tooltip="package: reflect";
+fontsize="16";
+style="filled";
+URL="/?f=reflect";
+penwidth="0.8";
+fillcolor="#E0FFE1";
+fontname="Tahoma bold";
+rank="sink";
+        
+        "(reflect.Value).Call" [ fillcolor="#adedad" label="(Value).Call" penwidth="1.5" tooltip="(reflect.Value).Call | defined in value.go:366\nat .:0: calling [go_server/examples/html_site.registerLocalSite$2]\nat .:0: calling [go_server/examples/html_site.registerLocalSite$1]" ]
+        
+    }
+
+    }
+
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*net/http.ServeMux).findHandler$1" [ color="saddlebrown" tooltip="at main.go:43: calling [(*net/http.ServeMux).findHandler$1]" style="dashed" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.globalOptionsHandler).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [(net/http.globalOptionsHandler).ServeHTTP]" ]
+    "go_server/examples/html_site.main" -> "(*log/slog.Logger).Error" [ color="saddlebrown" tooltip="at main.go:26: calling [(*log/slog.Logger).Error]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "go_server/examples/html_site.registerLocalSite$1" [ style="dashed" tooltip="at main.go:43: calling [go_server/examples/html_site.registerLocalSite$1]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.initALPNRequest).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:46: calling [(net/http.initALPNRequest).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.serverHandler).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:46: calling [(net/http.serverHandler).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.initALPNRequest).ServeHTTP" [ color="saddlebrown" tooltip="at main.go:43: calling [(net/http.initALPNRequest).ServeHTTP]" style="dashed" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*net/http.ServeMux).ServeHTTP" [ color="saddlebrown" tooltip="at main.go:43: calling [(*net/http.ServeMux).ServeHTTP]" style="dashed" ]
+    "(*go_server/pkg/httpserver.GoServer).hostPolicyMiddleware$1" -> "(net/http.HandlerFunc).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at server.go:262: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "go_server/pkg/httpserver.MethodMiddleware$1" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [go_server/pkg/httpserver.MethodMiddleware$1]" ]
+    "(*net/http.http2serverConn).runHandler" -> "go_server/examples/html_site.registerLocalSite$1" [ style="dashed" color="saddlebrown" tooltip="at h2_bundle.go:6412: calling [go_server/examples/html_site.registerLocalSite$1]" ]
+    "go_server/examples/html_site.main" -> "(*go_server/pkg/httpserver.GoServer).Start" [ color="saddlebrown" tooltip="at main.go:25: calling [(*go_server/pkg/httpserver.GoServer).Start]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.unencryptedHTTP2Request).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [(net/http.unencryptedHTTP2Request).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.globalOptionsHandler).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:46: calling [(net/http.globalOptionsHandler).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.HandlerFunc).ServeHTTP" [ tooltip="at main.go:43: calling [(net/http.HandlerFunc).ServeHTTP]" style="dashed" color="saddlebrown" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*net/http.redirectHandler).ServeHTTP" [ tooltip="at main.go:46: calling [(*net/http.redirectHandler).ServeHTTP]" style="dashed" color="saddlebrown" ]
+    "go_server/examples/html_site.registerLocalSite" -> "(*go_server/pkg/httpserver.GoServer).SetHomeRoute" [ color="saddlebrown" tooltip="at main.go:41: calling [(*go_server/pkg/httpserver.GoServer).SetHomeRoute]" ]
+    "go_server/examples/html_site.main" -> "log/slog.NewTextHandler" [ color="saddlebrown" tooltip="at main.go:15: calling [log/slog.NewTextHandler]" ]
+    "go_server/examples/html_site.registerLocalSite$1" -> "path/filepath.Join" [ color="saddlebrown" tooltip="at main.go:38: calling [path/filepath.Join]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "net/http.StripPrefix$1" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [net/http.StripPrefix$1]" ]
+    "go_server/pkg/httpserver.LoggingMiddleware$1" -> "(net/http.HandlerFunc).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at middleware.go:86: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+    "(*net/http.http2serverConn).runHandler" -> "go_server/examples/html_site.registerLocalSite$2" [ tooltip="at h2_bundle.go:6412: calling [go_server/examples/html_site.registerLocalSite$2]" style="dashed" color="saddlebrown" ]
+    "go_server/examples/html_site.main" -> "(*log/slog.Logger).Info" [ tooltip="at main.go:24: calling [(*log/slog.Logger).Info]" color="saddlebrown" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*net/http.ServeMux).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:46: calling [(*net/http.ServeMux).ServeHTTP]" ]
+    "go_server/pkg/httpserver.RecoveryMiddleware$1" -> "(net/http.HandlerFunc).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at middleware.go:126: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.serverHandler).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [(net/http.serverHandler).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*net/http.redirectHandler).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [(*net/http.redirectHandler).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "go_server/pkg/httpserver.RecoveryMiddleware$1" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [go_server/pkg/httpserver.RecoveryMiddleware$1]" ]
+    "go_server/pkg/httpserver.MethodMiddleware$1" -> "(net/http.HandlerFunc).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at middleware.go:65: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*go_server/pkg/httpserver.GoServer).HandleDefaultLandingPage$1" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [(*go_server/pkg/httpserver.GoServer).HandleDefaultLandingPage$1]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "go_server/pkg/httpserver.LoggingMiddleware$1" [ color="saddlebrown" tooltip="at main.go:43: calling [go_server/pkg/httpserver.LoggingMiddleware$1]" style="dashed" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*go_server/pkg/httpserver.GoServer).hostPolicyMiddleware$1" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [(*go_server/pkg/httpserver.GoServer).hostPolicyMiddleware$1]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "net/http.NotFound" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [net/http.NotFound]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.noopHandler).ServeHTTP" [ color="saddlebrown" tooltip="at main.go:43: calling [(net/http.noopHandler).ServeHTTP]" style="dashed" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "go_server/examples/html_site.registerLocalSite$2" [ style="dashed" tooltip="at main.go:43: calling [go_server/examples/html_site.registerLocalSite$2]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*go_server/pkg/httpserver.GoServer).ensureHomeRoute$1" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [(*go_server/pkg/httpserver.GoServer).ensureHomeRoute$1]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "net/http.http2handleHeaderListTooLong" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [net/http.http2handleHeaderListTooLong]" ]
+    "go_server/examples/html_site.main" -> "log/slog.New" [ color="saddlebrown" tooltip="at main.go:15: calling [log/slog.New]" ]
+    "go_server/examples/html_site.registerLocalSite$1" -> "net/http.ServeFile" [ tooltip="at main.go:38: calling [net/http.ServeFile]" color="saddlebrown" ]
+    "(net/http.HandlerFunc).ServeHTTP" -> "(net/http.HandlerFunc).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at server.go:2286: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+    "go_server/examples/html_site.main" -> "os.Exit" [ tooltip="at main.go:27: calling [os.Exit]" color="saddlebrown" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.unencryptedHTTP2Request).ServeHTTP" [ color="saddlebrown" tooltip="at main.go:46: calling [(net/http.unencryptedHTTP2Request).ServeHTTP]" style="dashed" ]
+    "go_server/examples/html_site.main" -> "go_server/pkg/httpserver.NewGoServer" [ color="saddlebrown" tooltip="at main.go:17: calling [go_server/pkg/httpserver.NewGoServer]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*net/http.fileHandler).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:46: calling [(*net/http.fileHandler).ServeHTTP]" ]
+    "net/http.StripPrefix$1" -> "(net/http.HandlerFunc).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at server.go:2348: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.HandlerFunc).ServeHTTP" [ color="saddlebrown" tooltip="at main.go:46: calling [(net/http.HandlerFunc).ServeHTTP]" style="dashed" ]
+    "(reflect.Value).Call" -> "go_server/examples/html_site.registerLocalSite$2" [ color="saddlebrown" tooltip="at .:0: calling [go_server/examples/html_site.registerLocalSite$2]" ]
+    "go_server/examples/html_site.registerLocalSite" -> "net/http.FileServer" [ color="saddlebrown" tooltip="at main.go:36: calling [net/http.FileServer]" ]
+    "go_server/examples/html_site.main" -> "go_server/examples/html_site.registerLocalSite" [ tooltip="at main.go:21: calling [go_server/examples/html_site.registerLocalSite]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "net/http.http2new400Handler$1" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [net/http.http2new400Handler$1]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*net/http.fileHandler).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [(*net/http.fileHandler).ServeHTTP]" ]
+    "(net/http.HandlerFunc).ServeHTTP" -> "go_server/examples/html_site.registerLocalSite$2" [ style="dashed" color="saddlebrown" tooltip="at server.go:2286: calling [go_server/examples/html_site.registerLocalSite$2]" ]
+    "(net/http.serverHandler).ServeHTTP" -> "(net/http.HandlerFunc).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at server.go:3311: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+    "go_server/examples/html_site.main" -> "(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes" [ color="saddlebrown" tooltip="at main.go:22: calling [(*go_server/pkg/httpserver.GoServer).AddDefaultGoServerRoutes]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(net/http.noopHandler).ServeHTTP" [ tooltip="at main.go:46: calling [(net/http.noopHandler).ServeHTTP]" style="dashed" color="saddlebrown" ]
+    "(*net/http.ServeMux).ServeHTTP" -> "(net/http.HandlerFunc).ServeHTTP" [ style="dashed" color="saddlebrown" tooltip="at server.go:2828: calling [(net/http.HandlerFunc).ServeHTTP]" ]
+    "go_server/examples/html_site.registerLocalSite$2" -> "(*go_server/pkg/httpserver.GoServer).HandleHealthCheck$1" [ style="dashed" color="saddlebrown" tooltip="at main.go:43: calling [(*go_server/pkg/httpserver.GoServer).HandleHealthCheck$1]" ]
+    "(reflect.Value).Call" -> "go_server/examples/html_site.registerLocalSite$1" [ color="saddlebrown" tooltip="at .:0: calling [go_server/examples/html_site.registerLocalSite$1]" ]
+    "(net/http.HandlerFunc).ServeHTTP" -> "go_server/examples/html_site.registerLocalSite$1" [ style="dashed" color="saddlebrown" tooltip="at server.go:2286: calling [go_server/examples/html_site.registerLocalSite$1]" ]
+}
