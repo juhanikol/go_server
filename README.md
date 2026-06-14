@@ -121,6 +121,8 @@ go vet ./...
 go run ./cmd/example_server
 ```
 
+The repository also has a basic CI gate in `.github/workflows/ci.yml` that runs `go test ./...`, `go vet ./...`, and `govulncheck ./...` on push and pull requests.
+
 ## Examples
 
 ### `examples/minimal`
