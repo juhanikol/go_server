@@ -132,6 +132,53 @@ func (GoServer *GoServer) registerInternalAssetRoutes() {
 	)
 }
 
+// RegisterLocalSite serves a simple local HTML/CSS folder.
+// RoutePrefix is usually "/" for a local homepage. SiteDir points to the
+// folder containing IndexFile and linked assets such as styles.css.
+func (GoServer *GoServer) RegisterLocalSite(RoutePrefix string, SiteDir string, IndexFile string) {
+	if RoutePrefix == "" {
+		RoutePrefix = "/"
+	}
+	if !strings.HasPrefix(RoutePrefix, "/") {
+		RoutePrefix = "/" + RoutePrefix
+	}
+	if IndexFile == "" {
+		IndexFile = "index.html"
+	}
+
+	FileServer := http.FileServer(http.Dir(SiteDir))
+	ServeIndex := func(ResponseWriter http.ResponseWriter, Request *http.Request) {
+		http.ServeFile(ResponseWriter, Request, filepath.Join(SiteDir, IndexFile))
+	}
+
+	if RoutePrefix == "/" {
+		GoServer.SetHomeRoute(func(ResponseWriter http.ResponseWriter, Request *http.Request) {
+			if Request.URL.Path == "/" {
+				ServeIndex(ResponseWriter, Request)
+				return
+			}
+			FileServer.ServeHTTP(ResponseWriter, Request)
+		})
+		return
+	}
+
+	GoServer.RegisterRoute(RoutePrefix, http.MethodGet, ServeIndex)
+
+	StaticPrefix := RoutePrefix
+	if !strings.HasSuffix(StaticPrefix, "/") {
+		StaticPrefix += "/"
+	}
+
+	GoServer.RegisteredPaths[StaticPrefix] = true
+	GoServer.GoServerRouter.Handle(StaticPrefix, GoServer.BuildRouteHandler(http.MethodGet, func(ResponseWriter http.ResponseWriter, Request *http.Request) {
+		if Request.URL.Path == StaticPrefix {
+			ServeIndex(ResponseWriter, Request)
+			return
+		}
+		http.StripPrefix(StaticPrefix, FileServer).ServeHTTP(ResponseWriter, Request)
+	}))
+}
+
 // ensureHomeRoute guarantees that "/" always has a valid handler.
 func (GoServer *GoServer) ensureHomeRoute() {
 	if GoServer.GoServerHomeHandler != nil {

@@ -2,9 +2,7 @@ package main
 
 import (
 	"log/slog"
-	"net/http"
 	"os"
-	"path/filepath"
 
 	"go_server/pkg/httpserver"
 )
@@ -18,14 +16,7 @@ func main() {
 		ServerAddress: address,
 	}, logger)
 
-	siteDir := filepath.Join("examples", "html_site", "site")
-
-	server.SetHomeRoute(func(responseWriter http.ResponseWriter, request *http.Request) {
-		http.ServeFile(responseWriter, request, filepath.Join(siteDir, "index.html"))
-	})
-	server.RegisterRoute("/styles.css", http.MethodGet, func(responseWriter http.ResponseWriter, request *http.Request) {
-		http.ServeFile(responseWriter, request, filepath.Join(siteDir, "styles.css"))
-	})
+	server.RegisterLocalSite("/", "examples/html_site/site", "index.html")
 	server.AddDefaultGoServerRoutes()
 
 	logger.Info("HTML site example listening", "addr", address, "url", "http://localhost:8083")
